@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { DEFAULT_POMODORO_SETTINGS, type PomodoroSettings, type PomodoroState } from '@/types'
 import { PomodoroRepository, INITIAL_POMODORO_STATE } from '@/services/storage/repositories/PomodoroRepository'
+import { ProductivityRepository } from '@/services/storage/repositories/ProductivityRepository'
 import { PomodoroAlarmService } from '@/services/alarms/CountdownAlarmService'
 import { nextPomodoroState } from '@/services/pomodoro/transition'
 import { elapsedMs } from '@/utils/time'
@@ -64,7 +65,12 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   skip: async () => {
     await PomodoroAlarmService.cancel()
     const { state, settings } = get()
+    const completingFocus = state.mode === 'focus'
     await persist(nextPomodoroState(state, settings), set)
+    // Manual skip never goes through the background alarm handler (there's
+    // no alarm to fire), so this is the only place a skipped-through focus
+    // phase gets counted for the Productivity widget.
+    if (completingFocus) await ProductivityRepository.logFocusSession(settings.focusMinutes)
   },
 
   reset: async () => {

@@ -1,6 +1,8 @@
-import { Search, Settings2 } from 'lucide-react'
+import { Search, Settings2, LayoutGrid, Check } from 'lucide-react'
 import { BRAND_LOGO_MARK, BRAND_NAME } from '@/config/brand'
 import { IconButton } from '@/components/ui/IconButton'
+import { useWidgetStore } from '@/store/useWidgetStore'
+import { cn } from '@/utils/cn'
 
 interface Props {
   onOpenSearch: () => void
@@ -9,6 +11,8 @@ interface Props {
 
 export function Header({ onOpenSearch, onOpenSettings }: Props) {
   const isMac = navigator.platform.toUpperCase().includes('MAC')
+  const customizing = useWidgetStore((s) => s.customizing)
+  const toggleCustomizing = useWidgetStore((s) => s.toggleCustomizing)
 
   return (
     <header className="mb-6 flex items-center justify-between">
@@ -31,6 +35,18 @@ export function Header({ onOpenSearch, onOpenSettings }: Props) {
       </button>
 
       <div className="flex items-center gap-1">
+        <button
+          onClick={toggleCustomizing}
+          className={cn(
+            'flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition-colors',
+            customizing
+              ? 'bg-accent text-white'
+              : 'text-text-secondary hover:bg-surface-elevated hover:text-text-primary',
+          )}
+        >
+          {customizing ? <Check size={13} /> : <LayoutGrid size={13} />}
+          {customizing ? 'Done' : 'Customize'}
+        </button>
         <IconButton icon={<Settings2 size={16} />} label="Settings" onClick={onOpenSettings} />
       </div>
     </header>

@@ -141,6 +141,23 @@ export interface Note {
 
 export type NoteDraft = Pick<Note, 'title'> & Partial<Pick<Note, 'content'>>
 
+// ── Productivity ─────────────────────────────────────────────────────
+
+export interface FocusSessionLogEntry {
+  id: string
+  minutes: number
+  completedAt: string // ISO datetime
+}
+
+// ── GitHub (placeholder — see services/github/GitHubService.ts) ───────
+
+export interface GitHubActivitySummary {
+  username: string
+  commits: number
+  pullRequests: number
+  issues: number
+}
+
 // ── Widgets ──────────────────────────────────────────────────────────
 
 export type WidgetType =
@@ -153,9 +170,10 @@ export type WidgetType =
   | 'DEV_TOOLS'
   | 'SNIPPETS'
   | 'NOTES'
-// Further types (PRODUCTIVITY, GITHUB, CALENDAR, QUOTE, SYSTEM_STATUS)
-// register the same way — see widgets/registry.ts — once their components
-// exist.
+  | 'PRODUCTIVITY'
+  | 'GITHUB'
+// Further types (CALENDAR, QUOTE, SYSTEM_STATUS) register the same way —
+// see widgets/registry.ts — once their components exist.
 
 export interface WidgetConfig {
   id: string

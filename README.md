@@ -41,13 +41,24 @@ touching existing code.
   snippets, notes, and dev-tool names
 - **Keyboard shortcuts** — `n` new task, `s` start stopwatch, `t` start timer,
   `Esc` close modal
+- **Dashboard customization** — a "Customize" mode (Header) for dragging
+  widgets to a new position, resizing from the corner handle, and hiding
+  widgets to a tray they can be restored from. Drops that would overlap
+  another widget are refused and the tile snaps back rather than stacking.
+- **Productivity** — tasks completed today/this 7 days, focus minutes today,
+  Pomodoro sessions today, current daily streak, and today's due-task
+  completion rate — all derived from real local data (todos +
+  a lightweight focus-session log), nothing simulated
+- **GitHub Activity** — placeholder widget with mock commit/PR/issue counts,
+  built against the exact return shape a real API integration would use
+  (`GitHubService.getActivity()`), so wiring up real data later doesn't
+  touch `GitHubWidget` at all
 - **Settings** — accent color, clock format, notification toggle, per-widget
   visibility, reset layout
 - Empty states, skeleton loaders, visible focus rings, `prefers-reduced-motion`
   support
 
 **Not yet built** (see Roadmap): command-palette *actions* (beyond search),
-drag/resize widget customization, productivity analytics, GitHub widget,
 Google account sync.
 
 ## 3. Screenshots
@@ -60,22 +71,50 @@ open a new tab → capture._
 - **React 18 + TypeScript (strict) + Vite**, bundled for MV3 by
   `@crxjs/vite-plugin` — this handles manifest generation, service-worker
   bundling, and HMR inside an extension context, which vanilla Vite doesn't.
-- **State:** Zustand. Each domain (todos, shortcuts, settings, widget layout) is
-  an independent store, not one shared graph — this app is a set of parallel
-  widgets, not an interconnected app, so Redux-style single-store ceremony
-  isn't earning its keep here.
+- **State:** Zustand. Each domain (todos, shortcuts, settings, widget layout,
+  stopwatch, timer, pomodoro, snippets, notes) is an independent store, not
+  one shared graph — this app is a set of parallel widgets, not an
+  interconnected app, so Redux-style single-store ceremony isn't earning
+  its keep here.
 - **Persistence:** a single `StorageService` wraps `chrome.storage` — nothing
   else calls the Chrome storage API directly. Repositories (`TodoRepository`,
-  `ShortcutRepository`, `SettingsRepository`, `WidgetRepository`) sit on top,
-  so the backend is swappable later without touching stores or components.
+  `ShortcutRepository`, `SettingsRepository`, `WidgetRepository`, and more)
+  sit on top, so the backend is swappable later without touching stores or
+  components.
 - **Widgets:** a `WidgetRegistry` (`src/widgets/registry.ts`) maps a `type`
   string to `{ title, icon, component }`. `BentoGrid` renders purely from the
-  `WidgetConfig[]` in the widget store — layout is data, not markup.
-- **Reminders:** `TaskAlarmService` schedules a `chrome.alarms` entry per task
-  with a due time; the background service worker (`src/background/index.ts`)
-  is the only place an alarm firing turns into a notification. This is
-  deliberate — alarms persist across service-worker restarts and browser
-  relaunches, a `setTimeout` in a page context does not.
+  `WidgetConfig[]` in the widget store, using each widget's explicit `x`/`y`
+  (not DOM order) — layout is data, not markup.
+- **Reminders/countdowns:** `TaskAlarmService` and `CountdownAlarmService`
+  schedule `chrome.alarms` entries; the background service worker
+  (`src/background/index.ts`) is the only place an alarm firing turns into
+  a notification (and, for Timer/Pomodoro, the authoritative state write).
+  This is deliberate — alarms persist across service-worker restarts and
+  browser relaunches, a `setTimeout` in a page context does not. Pomodoro's
+  phase-transition logic (`services/pomodoro/transition.ts`) is a pure
+  function called from both the store and the background worker, so a
+  phase change looks identical whether the tab was open when it happened
+  or not.
+- **Dashboard customization:** `useDragResize` converts pointer movement
+  into grid-column/row deltas and writes a preview rect to local state;
+  `useWidgetStore.updateWidgetRect` commits it only if the resulting
+  position doesn't overlap another visible widget (checked in
+  `utils/grid.ts`) — otherwise the change is rejected and the tile reverts.
+  This is deliberately not a full collision-avoidance grid engine (like
+  react-grid-layout): with nine widgets on a fixed 12-column grid, refusing
+  an invalid drop is simpler and cheaper than auto-rearranging everything
+  else, and it skips the dependency.
+- **Productivity:** derived from real data, not simulated — task completion
+  is read straight from `TodoRepository` (which already timestamps
+  `completedAt`); focus time and Pomodoro session counts come from a small
+  rolling log (`ProductivityRepository`) appended to at the same point a
+  Pomodoro focus phase completes, in both the background-alarm path and
+  the manual-skip path.
+- **GitHub widget:** intentionally mock data behind a real interface
+  (`GitHubService.getActivity()`) — per the brief, no GitHub login is
+  required for this MVP, but `GitHubWidget` only depends on that function's
+  return shape, so swapping the mock body for an authenticated API call
+  later doesn't touch the widget.
 
 ## 5. Project structure
 
@@ -215,8 +254,9 @@ unpacked for local use.
   palette extended to snippets/notes/tools~~ — done; full command-palette
   *actions* ("Create Task", "Start Timer" as executable commands, not just
   search results) still open
-- **Phase 6** — drag/resize widget customization mode
+- ~~**Phase 6** — drag/resize widget customization mode~~ — done
 - **Phase 7** — Google sign-in + Drive `appDataFolder` sync (architecture in §10)
-- **Phase 8** — productivity analytics, GitHub widget (mock data → real API)
+- ~~**Phase 8** — productivity analytics, GitHub widget (mock data)~~ — done;
+  swapping GitHub's mock data for a real API call is still open
 - **Phase 9** — test suite, performance pass, accessibility audit
 - **Phase 10** — Web Store assets and submission

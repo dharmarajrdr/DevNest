@@ -13,6 +13,8 @@ export const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'devtools', type: 'DEV_TOOLS', x: 0, y: 12, w: 4, h: 4, visible: true, minimized: false },
   { id: 'snippets', type: 'SNIPPETS', x: 4, y: 12, w: 4, h: 5, visible: true, minimized: false },
   { id: 'notes', type: 'NOTES', x: 8, y: 12, w: 4, h: 5, visible: true, minimized: false },
+  { id: 'productivity', type: 'PRODUCTIVITY', x: 0, y: 17, w: 6, h: 5, visible: true, minimized: false },
+  { id: 'github', type: 'GITHUB', x: 6, y: 17, w: 6, h: 5, visible: true, minimized: false },
 ]
 
 export const WidgetRepository = {

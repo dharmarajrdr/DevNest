@@ -1,6 +1,7 @@
 import { TodoRepository } from '@/services/storage/repositories/TodoRepository'
 import { TimerRepository } from '@/services/storage/repositories/TimerRepository'
 import { PomodoroRepository } from '@/services/storage/repositories/PomodoroRepository'
+import { ProductivityRepository } from '@/services/storage/repositories/ProductivityRepository'
 import { NotificationService } from '@/services/notifications/NotificationService'
 import { TaskAlarmService } from '@/services/alarms/TaskAlarmService'
 import { TimerAlarmService, PomodoroAlarmService } from '@/services/alarms/CountdownAlarmService'
@@ -34,8 +35,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     const state = await PomodoroRepository.get()
     if (state.timer.status !== 'running') return
     const settings = await PomodoroRepository.getSettings()
+    const completingFocus = state.mode === 'focus'
     const next = nextPomodoroState(state, settings)
     await PomodoroRepository.save(next)
+    if (completingFocus) await ProductivityRepository.logFocusSession(settings.focusMinutes)
     NotificationService.pomodoroPhaseComplete(next.mode)
   }
 })

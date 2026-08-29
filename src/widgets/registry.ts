@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { Clock, ListTodo, Link2, Timer, AlarmClock, Coffee, Wrench, Code2, NotebookPen, type LucideProps } from 'lucide-react'
+import { Clock, ListTodo, Link2, Timer, AlarmClock, Coffee, Wrench, Code2, NotebookPen, BarChart3, Github, type LucideProps } from 'lucide-react'
 import type { WidgetType } from '@/types'
 import { ClockWidget } from './clock/ClockWidget'
 import { TodoWidget } from './todo/TodoWidget'
@@ -10,6 +10,8 @@ import { PomodoroWidget } from './pomodoro/PomodoroWidget'
 import { DevToolsWidget } from './devtools/DevToolsWidget'
 import { SnippetsWidget } from './snippets/SnippetsWidget'
 import { NotesWidget } from './notes/NotesWidget'
+import { ProductivityWidget } from './productivity/ProductivityWidget'
+import { GitHubWidget } from './github/GitHubWidget'
 
 export interface WidgetDefinition {
   type: WidgetType
@@ -34,4 +36,6 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   DEV_TOOLS: { type: 'DEV_TOOLS', title: 'Developer Tools', icon: Wrench, component: DevToolsWidget },
   SNIPPETS: { type: 'SNIPPETS', title: 'Snippets', icon: Code2, component: SnippetsWidget },
   NOTES: { type: 'NOTES', title: 'Notes', icon: NotebookPen, component: NotesWidget },
+  PRODUCTIVITY: { type: 'PRODUCTIVITY', title: 'Productivity', icon: BarChart3, component: ProductivityWidget },
+  GITHUB: { type: 'GITHUB', title: 'GitHub Activity', icon: Github, component: GitHubWidget },
 }

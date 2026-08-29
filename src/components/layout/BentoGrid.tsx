@@ -1,14 +1,17 @@
-import { WIDGET_REGISTRY } from '@/widgets/registry'
+import { useEffect, useRef } from 'react'
 import { useWidgetStore } from '@/store/useWidgetStore'
-import { useEffect } from 'react'
+import { WidgetTile } from './WidgetTile'
+import { HiddenWidgetsTray } from './HiddenWidgetsTray'
 
 /**
- * Renders whatever is in the widget layout store as a 12-column CSS grid.
- * Layout is data (WidgetConfig[]), not markup — nothing here is hardcoded
- * to "clock top, todo left, shortcuts right"; that's just today's default.
+ * Renders whatever is in the widget layout store as a 12-column CSS grid,
+ * using each widget's explicit x/y so drag placement (see useDragResize)
+ * lands exactly where the user drops it — not wherever grid auto-flow
+ * would otherwise put it. Layout is data (WidgetConfig[]), not markup.
  */
 export function BentoGrid() {
-  const { layout, load, loading } = useWidgetStore()
+  const { layout, loading, customizing, load } = useWidgetStore()
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     load()
@@ -18,29 +21,20 @@ export function BentoGrid() {
   if (loading) return null
 
   return (
-    <div
-      className="grid auto-rows-[52px] grid-cols-12 gap-4"
-      role="region"
-      aria-label="Dashboard widgets"
-    >
-      {layout
-        .filter((w) => w.visible)
-        .map((w) => {
-          const def = WIDGET_REGISTRY[w.type]
-          if (!def) return null
-          const Widget = def.component
-          return (
-            <div
-              key={w.id}
-              style={{
-                gridColumn: `span ${w.w} / span ${w.w}`,
-                gridRow: `span ${w.h} / span ${w.h}`,
-              }}
-            >
-              <Widget />
-            </div>
-          )
-        })}
+    <div>
+      <div
+        ref={gridRef}
+        className="grid auto-rows-[52px] grid-cols-12 gap-4"
+        role="region"
+        aria-label="Dashboard widgets"
+      >
+        {layout
+          .filter((w) => w.visible)
+          .map((w) => (
+            <WidgetTile key={w.id} config={w} gridRef={gridRef} />
+          ))}
+      </div>
+      {customizing && <HiddenWidgetsTray />}
     </div>
   )
 }

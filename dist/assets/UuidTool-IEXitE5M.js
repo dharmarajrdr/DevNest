@@ -1,4 +1,4 @@
-import{c as x,r as s,j as e,T as l,a as d,C as i}from"./newtab.html-DvS1UF6n.js";import{g as n}from"./transition-BWYk5Rfz.js";/**
+import{c as x,r as s,j as e,T as l,a as d,C as i}from"./newtab.html-CQbxFkVU.js";import{g as n}from"./transition-DAEUM-8T.js";/**
  * @license lucide-react v0.462.0 - ISC
  *
  * This source code is licensed under the ISC license.
