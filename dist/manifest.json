@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DevTab — Software Engineer Command Center",
   "short_name": "DevTab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Replaces new tab with a developer's dashboard: tasks, shortcuts, and time tools in one Bento Grid.",
   "icons": {
     "16": "public/icons/icon16.png",

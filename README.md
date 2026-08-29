@@ -22,14 +22,32 @@ touching existing code.
   and delivered via `chrome.notifications` (survives browser restarts — not a
   React timer)
 - **Shortcuts** — CRUD, categories, automatic favicon with graceful fallback
-- **Command palette** — Cmd/Ctrl+K (and `/`), searches tasks and shortcuts
+- **Stopwatch** — start/pause/reset/lap, timestamp-based elapsed time (immune
+  to interval drift/throttling), state persists across tabs
+- **Timer** — presets (5–60 min) + custom duration, `chrome.alarms`-backed
+  finish notification that fires even if the tab is closed, optional chime
+- **Pomodoro** — focus/break cycling, configurable durations, session-count
+  dots, skip; phase transitions are identical whether the tab is open or not
+  (one shared pure function, called from both the store and the background
+  worker)
+- **Developer Tools** — 18 lazy-loaded utilities covering JSON format/minify,
+  Base64, URL encode/decode, UUID, timestamp converter, hash generator
+  (SHA-1/256/384/512), regex tester, JWT decoder, color converter, case
+  converter, Lorem Ipsum, random string, cron helper, SQL formatter, and
+  searchable Git/Docker/Linux/HTTP-status cheat sheets
+- **Snippets** — CRUD, categories, favorites, one-click copy
+- **Notes** — lightweight CRUD with autosave on close (not a Notion clone)
+- **Command palette** — Cmd/Ctrl+K (and `/`), searches tasks, shortcuts,
+  snippets, notes, and dev-tool names
+- **Keyboard shortcuts** — `n` new task, `s` start stopwatch, `t` start timer,
+  `Esc` close modal
 - **Settings** — accent color, clock format, notification toggle, per-widget
   visibility, reset layout
 - Empty states, skeleton loaders, visible focus rings, `prefers-reduced-motion`
   support
 
-**Not yet built** (see Roadmap): Stopwatch, Timer/Pomodoro, 20+ dev utilities,
-snippets, notes, productivity analytics, GitHub widget, drag/resize customization,
+**Not yet built** (see Roadmap): command-palette *actions* (beyond search),
+drag/resize widget customization, productivity analytics, GitHub widget,
 Google account sync.
 
 ## 3. Screenshots
@@ -191,12 +209,12 @@ unpacked for local use.
 
 ## 16. Roadmap
 
-- **Phase 3** — Stopwatch (timestamp-based, not a naive interval), Timer with
-  presets, Pomodoro mode
-- **Phase 4** — Developer utilities (JSON/Base64/URL/UUID/JWT/etc., each in
-  its own lazy-loaded modal), Snippets, Notes
-- **Phase 5** — full command-palette actions ("Create Task", "Start Timer"…),
-  remaining keyboard shortcuts (`n`, `s`, `t`)
+- ~~**Phase 3** — Stopwatch, Timer, Pomodoro~~ — done
+- ~~**Phase 4** — Developer utilities, Snippets, Notes~~ — done
+- ~~**Phase 5 (partial)** — keyboard shortcuts (`n`, `s`, `t`), command
+  palette extended to snippets/notes/tools~~ — done; full command-palette
+  *actions* ("Create Task", "Start Timer" as executable commands, not just
+  search results) still open
 - **Phase 6** — drag/resize widget customization mode
 - **Phase 7** — Google sign-in + Drive `appDataFolder` sync (architecture in §10)
 - **Phase 8** — productivity analytics, GitHub widget (mock data → real API)

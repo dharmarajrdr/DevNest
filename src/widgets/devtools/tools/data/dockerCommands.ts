@@ -1,0 +1,17 @@
+export const DOCKER_COMMANDS = [
+  { command: 'docker ps', description: 'List running containers' },
+  { command: 'docker ps -a', description: 'List all containers, including stopped ones' },
+  { command: 'docker images', description: 'List local images' },
+  { command: 'docker build -t name:tag .', description: 'Build an image from a Dockerfile' },
+  { command: 'docker run -d -p 8080:80 name', description: 'Run a container, detached, with a port mapping' },
+  { command: 'docker exec -it <id> sh', description: 'Open a shell inside a running container' },
+  { command: 'docker logs -f <id>', description: 'Stream a container\u2019s logs' },
+  { command: 'docker stop <id>', description: 'Stop a running container' },
+  { command: 'docker rm <id>', description: 'Remove a stopped container' },
+  { command: 'docker rmi <image>', description: 'Remove an image' },
+  { command: 'docker system prune -a', description: 'Remove all unused containers, images, and networks' },
+  { command: 'docker compose up -d', description: 'Start services defined in docker-compose.yml' },
+  { command: 'docker compose down', description: 'Stop and remove compose-managed containers' },
+  { command: 'docker inspect <id>', description: 'Show detailed container/image configuration' },
+  { command: 'docker network ls', description: 'List Docker networks' },
+]

@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { TodoItem } from './TodoItem'
 import { TodoFormModal } from './TodoFormModal'
 import { useTodoStore } from '@/store/useTodoStore'
+import { useUIStore } from '@/store/useUIStore'
 import { isOverdue, isToday, isUpcoming } from '@/utils/date'
 import { cn } from '@/utils/cn'
 
@@ -20,8 +21,8 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 export function TodoWidget() {
   const { todos, load, loading } = useTodoStore()
+  const { taskFormOpen: formOpen, setTaskFormOpen: setFormOpen } = useUIStore()
   const [filter, setFilter] = useState<Filter>('today')
-  const [formOpen, setFormOpen] = useState(false)
 
   useEffect(() => {
     load()

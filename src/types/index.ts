@@ -43,12 +43,119 @@ export interface Shortcut {
 export type ShortcutDraft = Pick<Shortcut, 'title' | 'url'> &
   Partial<Pick<Shortcut, 'description' | 'category'>>
 
+// ── Stopwatch ────────────────────────────────────────────────────────
+
+export type RunState = 'idle' | 'running' | 'paused'
+
+export interface Lap {
+  id: string
+  elapsedMs: number // total elapsed at the moment the lap was recorded
+  createdAt: string
+}
+
+export interface StopwatchState {
+  status: RunState
+  startedAt: number | null // epoch ms of the current run segment; null when not running
+  accumulatedMs: number // elapsed time banked from prior run segments
+  laps: Lap[]
+}
+
+export const IDLE_STOPWATCH: StopwatchState = {
+  status: 'idle',
+  startedAt: null,
+  accumulatedMs: 0,
+  laps: [],
+}
+
+// ── Timer ────────────────────────────────────────────────────────────
+
+export type TimerStatus = 'idle' | 'running' | 'paused' | 'finished'
+
+export interface TimerState {
+  status: TimerStatus
+  durationMs: number
+  startedAt: number | null // epoch ms of the current run segment
+  accumulatedMs: number // ms of durationMs already consumed before this run segment
+}
+
+export const IDLE_TIMER: TimerState = {
+  status: 'idle',
+  durationMs: 25 * 60_000,
+  startedAt: null,
+  accumulatedMs: 0,
+}
+
+// ── Pomodoro ─────────────────────────────────────────────────────────
+
+export type PomodoroMode = 'focus' | 'break'
+
+export interface PomodoroSettings {
+  focusMinutes: number
+  breakMinutes: number
+}
+
+export interface PomodoroState {
+  mode: PomodoroMode
+  completedFocusSessions: number
+  timer: TimerState
+}
+
+export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = { focusMinutes: 25, breakMinutes: 5 }
+
+// ── Snippets ─────────────────────────────────────────────────────────
+
+export type SnippetCategory =
+  | 'Git'
+  | 'Java'
+  | 'Spring Boot'
+  | 'JavaScript'
+  | 'TypeScript'
+  | 'SQL'
+  | 'Docker'
+  | 'Kubernetes'
+  | 'Linux'
+  | 'Regex'
+  | 'Custom'
+
+export interface Snippet {
+  id: string
+  title: string
+  code: string
+  category: SnippetCategory
+  favorite: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type SnippetDraft = Pick<Snippet, 'title' | 'code'> & Partial<Pick<Snippet, 'category'>>
+
+// ── Notes ────────────────────────────────────────────────────────────
+
+export interface Note {
+  id: string
+  title: string
+  content: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type NoteDraft = Pick<Note, 'title'> & Partial<Pick<Note, 'content'>>
+
 // ── Widgets ──────────────────────────────────────────────────────────
 
-export type WidgetType = 'CLOCK' | 'TODO' | 'SHORTCUTS'
-// Additional types (STOPWATCH, TIMER, POMODORO, DEV_TOOLS, SNIPPETS, NOTES,
-// PRODUCTIVITY, GITHUB, CALENDAR, QUOTE, SYSTEM_STATUS) register the same
-// way — see widgets/registry.ts — once their components exist.
+export type WidgetType =
+  | 'CLOCK'
+  | 'TODO'
+  | 'SHORTCUTS'
+  | 'STOPWATCH'
+  | 'TIMER'
+  | 'POMODORO'
+  | 'DEV_TOOLS'
+  | 'SNIPPETS'
+  | 'NOTES'
+// Further types (PRODUCTIVITY, GITHUB, CALENDAR, QUOTE, SYSTEM_STATUS)
+// register the same way — see widgets/registry.ts — once their components
+// exist.
 
 export interface WidgetConfig {
   id: string
