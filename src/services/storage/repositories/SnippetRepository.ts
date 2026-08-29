@@ -14,6 +14,11 @@ async function saveAll(snippets: Snippet[]): Promise<void> {
 export const SnippetRepository = {
   getAll,
 
+  /** Used by the sync engine to write back a merged local+remote set. */
+  async replaceAll(snippets: Snippet[]): Promise<void> {
+    await saveAll(snippets)
+  },
+
   async create(draft: SnippetDraft): Promise<Snippet> {
     const now = new Date().toISOString()
     const snippet: Snippet = {

@@ -3,6 +3,7 @@ import { useSettingsStore } from '@/store/useSettingsStore'
 import { useWidgetStore } from '@/store/useWidgetStore'
 import { theme } from '@/config/theme'
 import { WIDGET_REGISTRY } from '@/widgets/registry'
+import { SyncSection } from './SyncSection'
 
 interface Props {
   open: boolean
@@ -10,10 +11,9 @@ interface Props {
 }
 
 /**
- * A single starter settings panel covering Appearance, Clock, and
- * Notifications — Dashboard (widget visibility) is included since the
- * grid already supports it. Sync/About/full keyboard-shortcut sections
- * land with the phases that give them something real to configure.
+ * A settings panel covering Appearance, Clock, Notifications, Dashboard,
+ * and Sync. Full keyboard-shortcut and About sections are the remaining
+ * gap against the original spec's Settings list.
  */
 export function SettingsPanel({ open, onClose }: Props) {
   const { settings, update } = useSettingsStore()
@@ -96,6 +96,8 @@ export function SettingsPanel({ open, onClose }: Props) {
             Reset layout
           </button>
         </section>
+
+        <SyncSection />
       </div>
     </Modal>
   )

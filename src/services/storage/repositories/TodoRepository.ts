@@ -15,6 +15,11 @@ async function saveAll(todos: Todo[]): Promise<void> {
 export const TodoRepository = {
   getAll,
 
+  /** Used by the sync engine to write back a merged local+remote set. */
+  async replaceAll(todos: Todo[]): Promise<void> {
+    await saveAll(todos)
+  },
+
   async create(draft: TodoDraft): Promise<Todo> {
     const now = new Date().toISOString()
     const todo: Todo = {

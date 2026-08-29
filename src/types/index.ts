@@ -38,6 +38,7 @@ export interface Shortcut {
   category: ShortcutCategory
   order: number
   createdAt: string
+  updatedAt: string
 }
 
 export type ShortcutDraft = Pick<Shortcut, 'title' | 'url'> &
@@ -158,7 +159,27 @@ export interface GitHubActivitySummary {
   issues: number
 }
 
-// ── Widgets ──────────────────────────────────────────────────────────
+// ── Sync (Phase 7 — Google account sync) ───────────────────────────────
+
+export interface GoogleProfile {
+  email: string
+  name: string
+  pictureUrl?: string
+}
+
+export type SyncStatus = 'idle' | 'signed-out' | 'syncing' | 'synced' | 'error' | 'offline'
+
+/** Everything that syncs, as one JSON blob in the user's Drive appDataFolder. */
+export interface SyncPayload {
+  todos: Todo[]
+  shortcuts: Shortcut[]
+  notes: Note[]
+  snippets: Snippet[]
+  settings: Settings
+  widgetLayout: WidgetConfig[]
+  pomodoroSettings: PomodoroSettings
+  syncedAt: string
+}
 
 export type WidgetType =
   | 'CLOCK'

@@ -4,7 +4,10 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "outDir": "./.tsbuildcache",
+    "tsBuildInfoFile": "./.tsbuildcache/tsconfig.node.tsbuildinfo"
   },
-  "include": ["vite.config.ts", "manifest.config.ts"]
+  "include": ["vite.config.ts", "manifest.config.ts", "package.json"]
 }

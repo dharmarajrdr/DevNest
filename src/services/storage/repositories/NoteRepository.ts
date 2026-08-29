@@ -13,6 +13,10 @@ async function saveAll(notes: Note[]): Promise<void> {
 
 export const NoteRepository = {
   getAll,
+  /** Used by the sync engine to write back a merged local+remote set. */
+  async replaceAll(notes: Note[]): Promise<void> {
+    await saveAll(notes)
+  },
   async create(draft: NoteDraft): Promise<Note> {
     const now = new Date().toISOString()
     const note: Note = { id: generateId(), title: draft.title, content: draft.content ?? '', createdAt: now, updatedAt: now }

@@ -55,33 +55,34 @@ export function ShortcutsWidget() {
         ) : (
           <div className="grid grid-cols-3 gap-2 p-1">
             {shortcuts.map((s) => (
-              <a
+              <div
                 key={s.id}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="group relative flex flex-col items-center gap-1.5 rounded-lg border border-border bg-surface-elevated px-2 py-3 text-center transition-colors hover:border-accent/50"
               >
-                <img
-                  src={faviconUrl(s.url)}
-                  alt=""
-                  className="h-6 w-6 rounded"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.visibility = 'hidden'
-                  }}
-                />
-                <span className="w-full truncate text-[11px] text-text-primary">{s.title}</span>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full flex-col items-center gap-1.5"
+                >
+                  <img
+                    src={faviconUrl(s.url)}
+                    alt=""
+                    className="h-6 w-6 rounded"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.visibility = 'hidden'
+                    }}
+                  />
+                  <span className="w-full truncate text-[11px] text-text-primary">{s.title}</span>
+                </a>
                 <button
                   aria-label={`Remove ${s.title}`}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    remove(s.id)
-                  }}
+                  onClick={() => remove(s.id)}
                   className="absolute right-1 top-1 hidden rounded p-0.5 text-text-secondary hover:text-danger group-hover:block"
                 >
                   <Trash2 size={12} />
                 </button>
-              </a>
+              </div>
             ))}
           </div>
         )}

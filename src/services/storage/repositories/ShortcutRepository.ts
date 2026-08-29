@@ -16,8 +16,14 @@ async function saveAll(shortcuts: Shortcut[]): Promise<void> {
 export const ShortcutRepository = {
   getAll,
 
+  /** Used by the sync engine to write back a merged local+remote set. */
+  async replaceAll(shortcuts: Shortcut[]): Promise<void> {
+    await saveAll(shortcuts)
+  },
+
   async create(draft: ShortcutDraft): Promise<Shortcut> {
     const all = await getAll()
+    const now = new Date().toISOString()
     const shortcut: Shortcut = {
       id: generateId(),
       title: draft.title,
@@ -25,7 +31,8 @@ export const ShortcutRepository = {
       description: draft.description,
       category: draft.category ?? 'Custom',
       order: all.length,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     }
     await saveAll([...all, shortcut])
     return shortcut
@@ -36,7 +43,7 @@ export const ShortcutRepository = {
     let updated: Shortcut | undefined
     const next = all.map((s) => {
       if (s.id !== id) return s
-      updated = { ...s, ...patch }
+      updated = { ...s, ...patch, updatedAt: new Date().toISOString() }
       return updated
     })
     await saveAll(next)

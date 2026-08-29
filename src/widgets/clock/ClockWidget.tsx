@@ -23,11 +23,11 @@ export function ClockWidget() {
   const { clock } = settings
 
   const time = now.toLocaleTimeString(undefined, {
-    hour: 'numeric',
+    hour: '2-digit',
     minute: '2-digit',
     second: clock.showSeconds ? '2-digit' : undefined,
     hour12: !clock.use24Hour,
-  })
+  }).toUpperCase()
 
   const date = now.toLocaleDateString(undefined, {
     weekday: 'long',

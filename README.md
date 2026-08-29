@@ -53,13 +53,18 @@ touching existing code.
   built against the exact return shape a real API integration would use
   (`GitHubService.getActivity()`), so wiring up real data later doesn't
   touch `GitHubWidget` at all
+- **Google Sync** — sign in, then tasks/shortcuts/notes/snippets/settings
+  sync to a hidden folder in your own Google Drive (`appDataFolder`) via
+  `chrome.identity` + the Drive API — no custom backend. Requires a real
+  OAuth Client ID to actually authenticate (see §9); the code path is
+  fully wired either way.
 - **Settings** — accent color, clock format, notification toggle, per-widget
-  visibility, reset layout
+  visibility, reset layout, Sync (account, Sync now, last-synced time, status)
 - Empty states, skeleton loaders, visible focus rings, `prefers-reduced-motion`
-  support
+  support, keyboard-trapped modals with focus restored on close
 
 **Not yet built** (see Roadmap): command-palette *actions* (beyond search),
-Google account sync.
+a real (non-placeholder) OAuth Client ID.
 
 ## 3. Screenshots
 
@@ -120,25 +125,34 @@ open a new tab → capture._
 
 ```
 src/
-  background/          service worker — alarm → notification, only
+  background/          service worker — alarms → notifications, only
   components/ui/        Card, Button, IconButton, Modal, EmptyState, Badge
-  components/layout/    Header, BackgroundLayer, BentoGrid
+  components/layout/    Header, BackgroundLayer, BentoGrid, WidgetTile, HiddenWidgetsTray
   components/search/    CommandPalette (Cmd/Ctrl+K)
   widgets/<name>/        one folder per widget (component + hooks + subcomponents)
   widgets/registry.ts    the single place widgets are registered
   store/                 zustand slices, one per domain
   services/storage/      StorageService + repositories
-  services/alarms/       TaskAlarmService
+  services/alarms/       TaskAlarmService, CountdownAlarmService (Timer/Pomodoro)
   services/notifications/
-  hooks/ utils/ types/ config/ styles/
+  services/pomodoro/     pure phase-transition logic, shared by store + background
+  services/auth/         GoogleAuthService (chrome.identity wrapper)
+  services/sync/         DriveSyncService, SyncEngine
+  hooks/                 useKeyboardShortcut, useDragResize
+  utils/ types/ config/ styles/
   pages/NewTab/          entry point + page shell
-  pages/Settings/        settings panel
+  pages/Settings/        settings panel + SyncSection
+  test/                  chromeMock.ts — shared chrome.storage mock for tests
 
 public/
   icons/                 16/32/48/128 png, generated placeholder mark
   backgrounds/           placeholder background image
 
+store-assets/            generated small promo tile for the Web Store listing
 manifest.config.ts       MV3 manifest, single source of truth for permissions
+vitest.config.ts         standalone test config (kept separate from vite.config.ts)
+PRIVACY_POLICY.md        data-handling policy for the Web Store listing
+STORE_LISTING.md         draft listing copy
 ```
 
 ## 6. Local development
@@ -170,16 +184,27 @@ Type-checks (`tsc -b`) then bundles to `dist/`.
 `chrome_url_overrides.newtab` in the manifest is what redirects Chrome's New
 Tab page to `newtab.html` — no extra permission needed for the override itself.
 
-## 9. Google OAuth setup (not wired yet — see Roadmap)
+## 9. Google OAuth setup
 
-When the sync phase is built: create an OAuth 2.0 Client ID (type "Chrome
-Extension") in Google Cloud Console, add it under a `oauth2.client_id` key in
-`manifest.config.ts`, and request the `identity` permission plus the
-`https://www.googleapis.com/auth/drive.appdata` scope. No client secret is
-needed for the Chrome-extension OAuth flow — `chrome.identity.getAuthToken`
-handles the token exchange.
+The sync code is fully wired (`GoogleAuthService`, `DriveSyncService`,
+`SyncEngine`, the Sync section in Settings) but ships with a **placeholder**
+Client ID — `chrome.identity.getAuthToken` will fail until you swap it for a
+real one:
 
-## 10. Sync architecture (designed, not implemented)
+1. In [Google Cloud Console](https://console.cloud.google.com/), create an
+   OAuth 2.0 Client ID of type **Chrome Extension**. It needs your
+   extension's ID, which Chrome assigns when you first load it unpacked
+   (`chrome://extensions` → DevTab → the ID under its name).
+2. Enable the **Google Drive API** and **Google People API** (or the
+   userinfo endpoints) for the Cloud project.
+3. Replace `oauth2.client_id` in `manifest.config.ts` with the real Client ID.
+4. Rebuild (`npm run build`) and reload the unpacked extension.
+
+No client secret is needed — this OAuth flow is browser-side only, and a
+Chrome-extension Client ID isn't meant to be kept secret (it's baked into
+the public manifest either way).
+
+## 10. Sync architecture (implemented)
 
 Data syncs into the signed-in Google account's **Drive `appDataFolder`** — a
 hidden, per-application, per-user space in the user's own Drive — rather than
@@ -198,35 +223,70 @@ Drive appDataFolder (source of truth online)
 Other Chrome installs, same Google account
 ```
 
-Conflict resolution: last-write-wins per record, compared on `updatedAt`.
-This is intentionally simple for a single-user, single-device-at-a-time tool;
-a CRDT or operational-transform approach would be solving a problem this
-product doesn't have yet.
+Conflict resolution: last-write-wins per record, compared on `updatedAt`
+(`SyncEngine.mergeById`, covering todos/shortcuts/notes/snippets). The
+singleton config objects (settings, widget layout, Pomodoro settings)
+merge as a whole rather than field-by-field: remote wins only if another
+device pushed since this device's last successful sync, otherwise local
+wins. This is intentionally simple for a single-user, small-number-of-devices
+tool; a CRDT or operational-transform approach would be solving a problem
+this product doesn't have yet. One known gap worth flagging: there are no
+delete tombstones, so a record deleted on one device can reappear after a
+sync from a device that hasn't seen the delete yet — acceptable for this
+scale, worth fixing before relying on it heavily.
 
 ## 11. Permissions explanation
 
 | Permission | Why |
 |---|---|
 | `storage` | persist tasks, shortcuts, settings, and layout |
-| `alarms` | schedule task-due reminders that survive restarts |
-| `notifications` | show the task-due / timer-complete notification |
+| `alarms` | schedule task-due and timer/Pomodoro reminders that survive restarts |
+| `notifications` | show the task-due / timer-complete / phase-complete notification |
+| `identity` | Google sign-in for Sync — only requested interactively when the user clicks "Sign in with Google" |
+| host permission: `https://www.googleapis.com/*` | talk to the Drive and account-info APIs during Sync — nowhere else |
 
-No `host_permissions`, no `<all_urls>`, no `identity` in this build — each is
-added only in the phase that has a shipped feature needing it.
+Every permission maps to a shipped feature; none are speculative. See
+`PRIVACY_POLICY.md` for the full data-handling explanation the Web Store
+listing points to.
 
 ## 12. Environment variables
 
-None required for this build. The sync phase will need a Google OAuth Client
-ID (see §9), which should live in `manifest.config.ts`, not in a `.env` file
-committed to the repo, since it's baked into the built manifest either way —
-treat it as a public identifier (it is one), not a secret.
+None required to build or run. The Google OAuth Client ID (see §9) lives in
+`manifest.config.ts`, not a `.env` file — it's baked into the built manifest
+either way, and it's a public identifier, not a secret.
 
 ## 13. Testing
 
-`npm test` runs Vitest. Test scaffolding isn't included in this pass —
-priority candidates once added: due/overdue date logic (`src/utils/date.ts`),
-repository CRUD (`TodoRepository`, `ShortcutRepository`), and alarm scheduling
-edge cases (past due dates, disabled notifications).
+```bash
+npm test
+```
+
+Runs Vitest (`vitest.config.ts` — deliberately separate from `vite.config.ts`
+so tests don't need the crx plugin's extension-build context). Current
+coverage: 55 tests across `src/utils/date.test.ts`, `grid.test.ts`,
+`time.test.ts`, `productivity.test.ts`, `services/pomodoro/transition.test.ts`,
+and repository CRUD (`TodoRepository.test.ts`, `ShortcutRepository.test.ts`)
+against a hand-rolled `chrome.storage` mock (`src/test/chromeMock.ts`) — real
+`chrome.*` APIs don't exist outside an extension context, so repository
+tests need that mock to run at all.
+
+Not yet covered: `SyncEngine`'s merge logic (needs a Drive API mock),
+`useDragResize`'s pointer math, and component-level rendering tests (no
+React Testing Library / jsdom set up yet — everything above is pure-function
+or storage-layer, deliberately, to keep the test setup itself simple).
+
+**Performance:** the initial New Tab bundle is ~237KB (~70KB gzipped);
+every Developer Tools panel (18 of them) is `React.lazy`-loaded into its
+own chunk (~1KB each), so opening a tool costs a small fetch, not part of
+every page load. No polling anywhere — `chrome.alarms` replaces it for
+anything that needs to fire later.
+
+**Accessibility:** every icon-only control goes through `<IconButton>`,
+which requires an `aria-label`. `Modal` traps Tab focus while open and
+restores focus to whatever opened it on close. Global `:focus-visible`
+styling and `prefers-reduced-motion` support are in `globals.css`. Not yet
+done: a full WCAG contrast audit and screen-reader testing pass with an
+actual AT (NVDA/VoiceOver) rather than just semantic-HTML review.
 
 ## 14. Production build
 
@@ -240,11 +300,26 @@ unpacked for local use.
 ## 15. Chrome Web Store publishing
 
 1. `npm run build`
-2. Zip the **contents** of `dist/` (not the folder itself)
-3. Add real screenshots (§3) and a store listing description
-4. Upload via the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
-5. Fill in the privacy practices tab honestly against §11 — this build's
-   permission set is narrow enough to make that section short
+2. Zip the **contents** of `dist/` (not the folder itself) and upload via the
+   [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+3. **Screenshots (still needed, not included):** load the unpacked extension,
+   open a real new tab, and capture 1–5 screenshots at 1280×800 or 640×400.
+   `store-assets/small-promo-tile-440x280.png` is generated brand artwork for
+   the optional small promo tile slot — it is *not* a substitute for real
+   product screenshots, and the Web Store's policy requires the screenshots
+   themselves to be genuine.
+4. Listing copy is drafted in `STORE_LISTING.md` — short description,
+   detailed description, and category, ready to paste into the dashboard.
+5. Host `PRIVACY_POLICY.md` somewhere public (a GitHub Pages link off this
+   repo works) and link it in the dashboard's privacy-practices tab. Fill in
+   the `[fill in before publishing]` placeholders in that file first — a
+   real last-updated date and contact email.
+6. In the dashboard's **Permissions justification** fields, use §11's table
+   almost verbatim — it already maps every requested permission to the
+   feature that needs it.
+7. Set a real `oauth2.client_id` (§9) before submitting if Sync should work
+   for real users — a placeholder Client ID will make sign-in fail for
+   everyone who installs it.
 
 ## 16. Roadmap
 
@@ -255,8 +330,15 @@ unpacked for local use.
   *actions* ("Create Task", "Start Timer" as executable commands, not just
   search results) still open
 - ~~**Phase 6** — drag/resize widget customization mode~~ — done
-- **Phase 7** — Google sign-in + Drive `appDataFolder` sync (architecture in §10)
+- ~~**Phase 7** — Google sign-in + Drive `appDataFolder` sync~~ — code
+  complete (§9, §10); needs a real OAuth Client ID swapped in before it
+  authenticates for real users
 - ~~**Phase 8** — productivity analytics, GitHub widget (mock data)~~ — done;
   swapping GitHub's mock data for a real API call is still open
-- **Phase 9** — test suite, performance pass, accessibility audit
-- **Phase 10** — Web Store assets and submission
+- ~~**Phase 9** — test suite, performance pass, accessibility audit~~ — done
+  (§13); a full WCAG contrast/AT pass and `SyncEngine`/drag-resize test
+  coverage are the remaining gaps
+- ~~**Phase 10** — Web Store assets~~ — privacy policy, listing copy, and
+  promo art are done; real product screenshots and the actual Dashboard
+  submission are steps only a human with a Chrome Web Store developer
+  account can complete
