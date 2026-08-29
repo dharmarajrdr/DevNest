@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "DevTab — Software Engineer Command Center",
+  "short_name": "DevTab",
+  "version": "0.1.0",
+  "description": "Replaces new tab with a developer's dashboard: tasks, shortcuts, and time tools in one Bento Grid.",
+  "icons": {
+    "16": "public/icons/icon16.png",
+    "32": "public/icons/icon32.png",
+    "48": "public/icons/icon48.png",
+    "128": "public/icons/icon128.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ]
+}
