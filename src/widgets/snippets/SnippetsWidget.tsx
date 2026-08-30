@@ -33,7 +33,10 @@ export function SnippetsWidget() {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Snippets</CardTitle>
+        <div className="flex items-center gap-2">
+          <Code2 size={16} className="text-accent" />
+          <CardTitle>Snippets</CardTitle>
+        </div>
         <IconButton icon={<Plus size={16} />} label="Add snippet" onClick={() => setFormOpen(true)} />
       </CardHeader>
 

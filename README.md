@@ -1,4 +1,4 @@
-# DevTab
+# DevNest
 
 A Chrome New Tab replacement built for software engineers — a dark, Bento Grid
 dashboard combining task management, quick links, and (in later phases) developer
@@ -194,7 +194,7 @@ real one:
 1. In [Google Cloud Console](https://console.cloud.google.com/), create an
    OAuth 2.0 Client ID of type **Chrome Extension**. It needs your
    extension's ID, which Chrome assigns when you first load it unpacked
-   (`chrome://extensions` → DevTab → the ID under its name).
+   (`chrome://extensions` → DevNest → the ID under its name).
 2. Enable the **Google Drive API** and **Google People API** (or the
    userinfo endpoints) for the Cloud project.
 3. Replace `oauth2.client_id` in `manifest.config.ts` with the real Client ID.

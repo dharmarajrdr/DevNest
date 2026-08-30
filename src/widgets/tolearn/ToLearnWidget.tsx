@@ -27,7 +27,7 @@ import type { LearnStatus, LearnTopic, SkillLevel } from '@/types'
 import { cn } from '@/utils/cn'
 
 type ViewTab = 'topics' | 'skills'
-type TopicFilter = 'IN_PROGRESS' | 'TO_LEARN'
+type TopicFilter = 'ALL' | 'IN_PROGRESS' | 'TO_LEARN'
 
 const LEVEL_COLORS: Record<SkillLevel, { bg: string; text: string; border: string }> = {
   BEGINNER: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
@@ -36,12 +36,10 @@ const LEVEL_COLORS: Record<SkillLevel, { bg: string; text: string; border: strin
   EXPERT: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
 }
 
-const COMMON_EMOJIS = ['🐳', '☸️', '📊', '🔷', '🦀', '🐹', '🐍', '⚛️', '☁️', '🐧', '⚡', '🚀', '🧠', '🛡️', '📦']
-
 export function ToLearnWidget() {
   const { topics, loading, load, create, update, toggleComplete, remove } = useToLearnStore()
   const [activeTab, setActiveTab] = useState<ViewTab>('topics')
-  const [filter, setFilter] = useState<TopicFilter>('IN_PROGRESS')
+  const [filter, setFilter] = useState<TopicFilter>('ALL')
   const [search, setSearch] = useState('')
 
   // Add / Edit modal state
@@ -51,7 +49,6 @@ export function ToLearnWidget() {
   const [category, setCategory] = useState('')
   const [level, setLevel] = useState<SkillLevel>('BEGINNER')
   const [status, setStatus] = useState<LearnStatus>('TO_LEARN')
-  const [icon, setIcon] = useState('🚀')
   const [resourceLink, setResourceLink] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -71,7 +68,6 @@ export function ToLearnWidget() {
     setCategory('')
     setLevel('BEGINNER')
     setStatus('TO_LEARN')
-    setIcon('🚀')
     setResourceLink('')
     setNotes('')
     setModalOpen(true)
@@ -83,7 +79,6 @@ export function ToLearnWidget() {
     setCategory(t.category || '')
     setLevel(t.level)
     setStatus(t.status)
-    setIcon(t.icon || '🚀')
     setResourceLink(t.resourceLink || '')
     setNotes(t.notes || '')
     setModalOpen(true)
@@ -103,7 +98,6 @@ export function ToLearnWidget() {
       category: category.trim() || undefined,
       level,
       status,
-      icon: icon.trim() || '🚀',
       resourceLink: formattedLink || undefined,
       notes: notes.trim() || undefined,
     }
@@ -131,7 +125,7 @@ export function ToLearnWidget() {
         t.notes?.toLowerCase().includes(search.toLowerCase())
 
       if (!matchSearch) return false
-      if (filter === 'IN_PROGRESS') return t.status === 'IN_PROGRESS'
+      if (filter === 'ALL') return true
       return t.status === filter
     })
   }, [activeUncompletedTopics, search, filter])
@@ -215,7 +209,7 @@ export function ToLearnWidget() {
 
               {/* Status Filters */}
               <div className="flex gap-1">
-                {(['IN_PROGRESS', 'TO_LEARN'] as TopicFilter[]).map((f) => (
+                {(['ALL', 'IN_PROGRESS', 'TO_LEARN'] as TopicFilter[]).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
@@ -226,7 +220,7 @@ export function ToLearnWidget() {
                         : 'text-text-secondary hover:text-text-primary',
                     )}
                   >
-                    {f === 'IN_PROGRESS' ? 'Learning' : 'To Learn'}
+                    {f === 'ALL' ? 'All' : f === 'IN_PROGRESS' ? 'Learning' : 'To Learn'}
                   </button>
                 ))}
               </div>
@@ -284,7 +278,6 @@ export function ToLearnWidget() {
                       {/* Topic Main Details */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-base select-none">{t.icon || '🚀'}</span>
                           <span className="text-xs font-bold text-text-primary">
                             {t.title}
                           </span>
@@ -395,22 +388,17 @@ export function ToLearnWidget() {
                       >
                         {/* Top Badge Tier & Star */}
                         <div className="flex items-start justify-between">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated border border-amber-500/30 text-2xl shadow-inner transition-transform">
-                            {t.icon || '🚀'}
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-1.5 py-0.2 text-[9px] font-bold text-amber-400 shadow-sm">
-                              <Star size={9} className="fill-amber-400" /> Mastered
-                            </span>
-                            <Badge className={cn('text-[8px] px-1 py-0', lvl.bg, lvl.text, lvl.border)}>
-                              {t.level}
-                            </Badge>
-                          </div>
+                          <Badge className={cn('text-[9px] px-2 py-0.5 font-bold', lvl.bg, lvl.text, lvl.border)}>
+                            {t.level}
+                          </Badge>
+                          <span className="flex items-center gap-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-1.5 py-0.2 text-[9px] font-bold text-amber-400 shadow-sm">
+                            <Star size={9} className="fill-amber-400" /> Mastered
+                          </span>
                         </div>
 
                         {/* Title and Category */}
                         <div>
-                          <h4 className="text-xs font-bold text-text-primary truncate">{t.title}</h4>
+                          <h4 className="text-sm font-bold text-text-primary truncate">{t.title}</h4>
                           <span className="text-[10px] text-text-secondary block truncate mt-0.5">
                             {t.category || 'Core Skill'}
                           </span>
@@ -446,11 +434,8 @@ export function ToLearnWidget() {
           <div className="space-y-4">
             {/* Header Hero */}
             <div className="flex items-center gap-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 to-surface-elevated/40 p-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-elevated border border-amber-500/40 text-3xl shadow-md">
-                {selectedSkillBadge.icon || '🚀'}
-              </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="text-base font-bold text-text-primary truncate">
                     {selectedSkillBadge.title}
                   </h3>
@@ -458,7 +443,7 @@ export function ToLearnWidget() {
                     <Star size={10} className="fill-amber-400" /> Mastered
                   </span>
                 </div>
-                <div className="flex items-center gap-2 mt-1 text-xs">
+                <div className="flex items-center gap-2 mt-1.5 text-xs">
                   <Badge
                     className={cn(
                       'text-[10px] px-2 py-0.5',
@@ -589,29 +574,6 @@ export function ToLearnWidget() {
                 <option value="ADVANCED">Advanced</option>
                 <option value="EXPERT">Expert</option>
               </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-text-primary">
-              Choose Icon Badge
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {COMMON_EMOJIS.map((em) => (
-                <button
-                  type="button"
-                  key={em}
-                  onClick={() => setIcon(em)}
-                  className={cn(
-                    'h-8 w-8 rounded-lg border text-base flex items-center justify-center transition-all',
-                    icon === em
-                      ? 'border-accent bg-accent/20 scale-110 shadow-sm'
-                      : 'border-border bg-surface-elevated/40 hover:bg-surface-elevated',
-                  )}
-                >
-                  {em}
-                </button>
-              ))}
             </div>
           </div>
 

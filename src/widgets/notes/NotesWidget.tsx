@@ -46,7 +46,10 @@ export function NotesWidget() {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Notes</CardTitle>
+        <div className="flex items-center gap-2">
+          <NotebookPen size={16} className="text-accent" />
+          <CardTitle>Notes</CardTitle>
+        </div>
         <IconButton icon={<Plus size={16} />} label="New note" onClick={handleCreate} />
       </CardHeader>
 

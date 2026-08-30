@@ -69,6 +69,7 @@ export function TodoWidget() {
     <Card className="flex h-full flex-col">
       <CardHeader>
         <div className="flex items-center gap-2">
+          <ListTodo size={16} className="text-accent" />
           <CardTitle>Tasks</CardTitle>
           {streak > 0 && (
             <span className="flex items-center gap-0.5 text-xs font-semibold text-amber-500">

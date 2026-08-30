@@ -20,5 +20,5 @@ policy. To capture them:
 4. Repeat for 2–4 more views worth showing: Customize mode mid-drag, the
    Command Palette open, a Developer Tools panel, the Pomodoro widget mid-session
 
-Optional: a 1400×560 marquee image, only needed if you want DevTab
+Optional: a 1400×560 marquee image, only needed if you want DevNest
 considered for Chrome Web Store featured placement.

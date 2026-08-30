@@ -29,7 +29,10 @@ export function StopwatchWidget() {
     <>
       <Card className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle>Stopwatch</CardTitle>
+          <div className="flex items-center gap-2">
+            <Timer size={16} className="text-accent" />
+            <CardTitle>Stopwatch</CardTitle>
+          </div>
           <div className="flex items-center gap-1">
             <IconButton
               icon={<Maximize2 size={14} />}

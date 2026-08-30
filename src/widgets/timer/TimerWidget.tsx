@@ -42,7 +42,10 @@ export function TimerWidget() {
     <>
       <Card className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle>Timer</CardTitle>
+          <div className="flex items-center gap-2">
+            <AlarmClock size={16} className="text-accent" />
+            <CardTitle>Timer</CardTitle>
+          </div>
           <div className="flex items-center gap-1">
             <IconButton
               icon={<Maximize2 size={14} />}

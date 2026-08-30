@@ -1,10 +1,10 @@
-# DevTab — Chrome Web Store listing copy
+# DevNest — Chrome Web Store listing copy
 
 Ready to paste into the Developer Dashboard. Fields are labeled with the
 Dashboard's own field names.
 
 ## Item name
-DevTab
+DevNest
 
 ## Category
 Productivity
@@ -19,7 +19,7 @@ A developer's command center for your new tab: tasks, shortcuts, timers, and dev
 
 ## Detailed description
 
-DevTab replaces Chrome's New Tab page with a dashboard built for software
+DevNest replaces Chrome's New Tab page with a dashboard built for software
 engineers — everything you check first thing, in one place instead of six
 tabs.
 
@@ -56,7 +56,7 @@ local data.
 Drag widgets to rearrange them, resize from the corner, hide what you
 don't use, and pick an accent color. Optionally sign in with Google to
 sync everything to your own Drive — nothing is visible to any other app,
-and nothing is ever sent to DevTab's developer.
+and nothing is ever sent to DevNest's developer.
 
 Works fully offline. No account required.
 
@@ -70,7 +70,7 @@ build — see store-assets/README.md for how.]
   featured placement
 
 ## Privacy practices tab
-- Single purpose description: "DevTab replaces the Chrome New Tab page
+- Single purpose description: "DevNest replaces the Chrome New Tab page
   with a productivity dashboard for developers."
 - Privacy policy URL: [host PRIVACY_POLICY.md somewhere public and link
   it here — GitHub Pages or a repo's raw file URL both work]

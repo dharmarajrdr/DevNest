@@ -5,10 +5,10 @@ import pkg from './package.json';
 // why in a comment next to it.
 export default defineManifest({
     manifest_version: 3,
-    name: 'DevTab',
-    short_name: 'DevTab',
+    name: 'DevNest',
+    short_name: 'DevNest',
     version: pkg.version,
-    description: "Replaces new tab with a developer's dashboard: tasks, shortcuts, and time tools in one Bento Grid.",
+    description: "Replaces new tab with a developer's dashboard: tasks, shortcuts, coding streak, and productivity tools in one Bento Grid.",
     icons: {
         16: 'public/icons/icon16.png',
         32: 'public/icons/icon32.png',

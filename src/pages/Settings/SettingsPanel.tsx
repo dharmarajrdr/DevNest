@@ -81,7 +81,7 @@ const TABS: TabConfig[] = [
   },
   {
     key: 'dashboard',
-    label: 'Customization & Widgets',
+    label: 'Widgets',
     icon: LayoutGrid,
     badgeColor: 'text-emerald-400',
     badgeBg: 'bg-emerald-500/10',

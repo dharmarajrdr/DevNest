@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Flame, Timer as TimerIcon, CheckCircle2 } from 'lucide-react'
+import { BarChart3, Flame, Timer as TimerIcon, CheckCircle2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { useTodoStore } from '@/store/useTodoStore'
 import { ProductivityRepository } from '@/services/storage/repositories/ProductivityRepository'
@@ -50,7 +50,10 @@ export function ProductivityWidget() {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Productivity</CardTitle>
+        <div className="flex items-center gap-2">
+          <BarChart3 size={16} className="text-accent" />
+          <CardTitle>Productivity</CardTitle>
+        </div>
         {streak > 0 && (
           <span className="flex items-center gap-1 text-xs font-medium text-warning">
             <Flame size={13} /> {streak} day{streak === 1 ? '' : 's'}

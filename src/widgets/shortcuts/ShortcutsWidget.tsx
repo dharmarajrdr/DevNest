@@ -27,13 +27,13 @@ function faviconUrl(url: string): string {
   }
 }
 
-function domainName(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return ''
-  }
-}
+// function domainName(url: string): string {
+//   try {
+//     return new URL(url).hostname.replace(/^www\./, '')
+//   } catch {
+//     return ''
+//   }
+// }
 
 import { StorageService } from '@/services/storage/StorageService'
 
@@ -115,6 +115,7 @@ export function ShortcutsWidget() {
     <Card className="flex h-full flex-col">
       <CardHeader>
         <div className="flex items-center gap-2">
+          <Link2 size={16} className="text-accent" />
           <CardTitle>Shortcuts</CardTitle>
           <span className="text-[11px] font-semibold text-text-secondary">
             {shortcuts.length} links
@@ -335,9 +336,9 @@ function ShortcutCard({
           <span className="block truncate text-xs font-semibold text-text-primary group-hover:text-accent transition-colors">
             {s.title}
           </span>
-          <span className="block truncate text-[10px] text-text-secondary mt-0.5">
+          {/* <span className="block truncate text-[10px] text-text-secondary mt-0.5">
             {domainName(s.url)}
-          </span>
+          </span> */}
         </div>
       </a>
       <button

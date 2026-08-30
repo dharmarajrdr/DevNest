@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Wrench } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { DEV_TOOLS, type DevToolDefinition } from './tools/registry'
 import { ToolModal } from './ToolModal'
@@ -9,7 +10,10 @@ export function DevToolsWidget() {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Developer Tools</CardTitle>
+        <div className="flex items-center gap-2">
+          <Wrench size={16} className="text-accent" />
+          <CardTitle>Developer Tools</CardTitle>
+        </div>
       </CardHeader>
       <div className="grid flex-1 grid-cols-3 gap-2 overflow-y-auto px-3 pb-3 sm:grid-cols-4">
         {DEV_TOOLS.map((tool) => {

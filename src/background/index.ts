@@ -46,6 +46,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     // Placeholder for first-run seeding / onboarding hook (Phase 6+).
-    console.info('DevTab installed.')
+    console.info('DevNest installed.')
   }
 })

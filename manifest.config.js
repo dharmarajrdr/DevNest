@@ -5,8 +5,8 @@ import pkg from './package.json';
 // why in a comment next to it.
 export default defineManifest({
     manifest_version: 3,
-    name: 'DevTab — Software Engineer Command Center',
-    short_name: 'DevTab',
+    name: 'DevNest — Software Engineer Command Center',
+    short_name: 'DevNest',
     version: pkg.version,
     description: "Replaces new tab with a developer's dashboard: tasks, shortcuts, and time tools in one Bento Grid.",
     icons: {

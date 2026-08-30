@@ -20,7 +20,6 @@ describe('ToLearnRepository', () => {
       category: 'Monitoring',
       level: 'INTERMEDIATE',
       status: 'TO_LEARN',
-      icon: '📊',
       resourceLink: 'https://grafana.com/docs/',
     })
 

@@ -48,7 +48,10 @@ export function PomodoroWidget() {
     <>
       <Card className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle>Pomodoro</CardTitle>
+          <div className="flex items-center gap-2">
+            <Coffee size={16} className="text-accent" />
+            <CardTitle>Pomodoro</CardTitle>
+          </div>
           <div className="flex items-center gap-1">
             <IconButton
               icon={<Maximize2 size={14} />}

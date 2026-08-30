@@ -16,6 +16,7 @@ import {
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Modal } from '@/components/ui/Modal'
 import { IconButton } from '@/components/ui/IconButton'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useWatchLaterStore } from '@/store/useWatchLaterStore'
@@ -23,13 +24,14 @@ import { parseYouTubeUrl } from '@/services/storage/repositories/WatchLaterRepos
 import type { WatchLaterItem } from '@/types'
 import { cn } from '@/utils/cn'
 
-type FilterTab = 'UNWATCHED' | 'WATCHED'
+type FilterTab = 'ALL' | 'UNWATCHED' | 'WATCHED'
 
 export function WatchLaterWidget() {
   const { items, loading, load, addByUrl, toggleComplete, remove } = useWatchLaterStore()
+  const [modalOpen, setModalOpen] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<FilterTab>('UNWATCHED')
+  const [filter, setFilter] = useState<FilterTab>('ALL')
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deletingItem, setDeletingItem] = useState<WatchLaterItem | null>(null)
@@ -37,6 +39,12 @@ export function WatchLaterWidget() {
   useEffect(() => {
     load()
   }, [load])
+
+  function handleOpenAdd() {
+    setUrlInput('')
+    setError(null)
+    setModalOpen(true)
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -54,6 +62,7 @@ export function WatchLaterWidget() {
       setAdding(true)
       await addByUrl(trimmed)
       setUrlInput('')
+      setModalOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add video.')
     } finally {
@@ -98,44 +107,13 @@ export function WatchLaterWidget() {
               </Badge>
             )}
           </div>
+
+          <div className="flex items-center gap-1">
+            <IconButton icon={<Plus size={15} />} label="Add Video / Playlist" onClick={handleOpenAdd} />
+          </div>
         </CardHeader>
 
         <div className="flex flex-1 flex-col justify-between p-4 pt-1 gap-3 overflow-hidden">
-          {/* Add Video/Playlist Form */}
-          <form onSubmit={handleAdd} className="space-y-1.5">
-            <div className="flex gap-2">
-              <input
-                value={urlInput}
-                onChange={(e) => {
-                  setUrlInput(e.target.value)
-                  if (error) setError(null)
-                }}
-                placeholder="Paste YouTube video or playlist link..."
-                className={cn(
-                  'flex-1 rounded-lg border bg-bg px-3 py-1.5 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent',
-                  error ? 'border-danger/50' : 'border-border',
-                )}
-              />
-              <Button size="sm" type="submit" disabled={adding || !urlInput.trim()} className="shrink-0 bg-rose-600 hover:bg-rose-500 text-white">
-                {adding ? (
-                  <RefreshCw size={13} className="animate-spin" />
-                ) : (
-                  <>
-                    <Plus size={13} /> Add
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-center gap-1.5 text-xs text-danger animate-fadeIn">
-                <AlertCircle size={13} className="shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-          </form>
-
           {/* Search & Filter Controls */}
           <div className="flex items-center justify-between gap-2">
             <div className="relative flex-1">
@@ -149,7 +127,7 @@ export function WatchLaterWidget() {
             </div>
 
             <div className="flex gap-1">
-              {(['UNWATCHED', 'WATCHED'] as FilterTab[]).map((f) => (
+              {(['ALL', 'UNWATCHED', 'WATCHED'] as FilterTab[]).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -160,7 +138,7 @@ export function WatchLaterWidget() {
                       : 'text-text-secondary hover:text-text-primary',
                   )}
                 >
-                  {f === 'UNWATCHED' ? 'To Watch' : 'Watched'}
+                  {f === 'ALL' ? 'All' : f === 'UNWATCHED' ? 'To Watch' : 'Watched'}
                 </button>
               ))}
             </div>
@@ -171,10 +149,17 @@ export function WatchLaterWidget() {
             {loading ? (
               <div className="flex-1 animate-pulse" />
             ) : filteredItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-32 text-center text-text-secondary">
-                <Film size={22} className="opacity-30 mb-1.5" />
-                <p className="text-xs">No videos in watch later.</p>
-                <p className="text-[11px] text-text-secondary/70 mt-0.5">Paste a YouTube link above to save for later.</p>
+              <div className="flex flex-col items-center justify-center h-40 text-center p-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-elevated text-text-secondary mb-2">
+                  <Film size={22} className="opacity-40" />
+                </div>
+                <h4 className="text-xs font-bold text-text-primary">No videos in watch later</h4>
+                <p className="text-[11px] text-text-secondary mt-1 max-w-xs">
+                  Save YouTube tutorials, tech talks, and playlists to watch when you have time.
+                </p>
+                <Button size="sm" onClick={handleOpenAdd} className="mt-3 bg-rose-600 hover:bg-rose-500 text-white">
+                  <Plus size={13} /> Add Video or Playlist
+                </Button>
               </div>
             ) : (
               filteredItems.map((item) => (
@@ -268,6 +253,62 @@ export function WatchLaterWidget() {
           </div>
         </div>
       </Card>
+
+      {/* Add Video / Playlist Modal */}
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Add to Watch Later"
+        maxWidth="max-w-md"
+      >
+        <form onSubmit={handleAdd} className="space-y-4">
+          <div>
+            <label htmlFor="yt-link-input" className="mb-1 block text-xs font-semibold text-text-primary">
+              YouTube Video or Playlist URL
+            </label>
+            <input
+              id="yt-link-input"
+              value={urlInput}
+              onChange={(e) => {
+                setUrlInput(e.target.value)
+                if (error) setError(null)
+              }}
+              placeholder="e.g. https://www.youtube.com/watch?v=... or playlist link"
+              className={cn(
+                'w-full rounded-lg border bg-bg px-3 py-2 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent',
+                error ? 'border-danger/50' : 'border-border',
+              )}
+              autoFocus
+            />
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/10 p-2.5 text-xs text-danger animate-fadeIn">
+              <AlertCircle size={14} className="shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={adding || !urlInput.trim()}
+              className="bg-rose-600 hover:bg-rose-500 text-white"
+            >
+              {adding ? (
+                <>
+                  <RefreshCw size={13} className="animate-spin" /> Adding...
+                </>
+              ) : (
+                'Add to Watch Later'
+              )}
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal

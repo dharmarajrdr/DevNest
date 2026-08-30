@@ -12,7 +12,6 @@ export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
     status: 'IN_PROGRESS',
     notes: 'Containers, Dockerfile, multi-stage builds, docker-compose.',
     resourceLink: 'https://docs.docker.com/',
-    icon: '🐳',
     createdAt: new Date().toISOString(),
   },
   {
@@ -23,7 +22,6 @@ export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
     status: 'TO_LEARN',
     notes: 'Pods, Deployments, Services, Ingress, Helm charts.',
     resourceLink: 'https://kubernetes.io/docs/',
-    icon: '☸️',
     createdAt: new Date().toISOString(),
   },
   {
@@ -34,7 +32,6 @@ export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
     status: 'TO_LEARN',
     notes: 'Prometheus metrics, dashboard panels, alerting rules.',
     resourceLink: 'https://grafana.com/docs/',
-    icon: '📊',
     createdAt: new Date().toISOString(),
   },
   {
@@ -45,7 +42,6 @@ export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
     status: 'COMPLETED',
     notes: 'Generics, conditional types, mapped types, utility types.',
     resourceLink: 'https://www.typescriptlang.org/docs/',
-    icon: '🔷',
     createdAt: new Date().toISOString(),
     completedAt: new Date().toISOString(),
   },
@@ -57,7 +53,6 @@ export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
     status: 'TO_LEARN',
     notes: 'Ownership, borrowing, lifetimes, async/await, concurrency.',
     resourceLink: 'https://www.rust-lang.org/learn',
-    icon: '🦀',
     createdAt: new Date().toISOString(),
   },
 ]
