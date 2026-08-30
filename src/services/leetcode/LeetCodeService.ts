@@ -123,29 +123,93 @@ export const LeetCodeService = {
     }
 
     const cleanUsername = username.trim()
+    let rawData: Record<string, any> | null = null
+    let lastError: Error | null = null
 
-    // 1. Fetch from high-uptime LeetCode stats API
-    const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${cleanUsername}`)
-    if (!res.ok) {
-      throw new Error(`LeetCode API error: ${res.statusText}`)
+    // Endpoint 1: leetcode-stats-api
+    try {
+      const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${cleanUsername}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data && data.status !== 'error' && data.message !== 'user does not exist') {
+          rawData = data
+        } else if (data?.message === 'user does not exist') {
+          throw new Error(`LeetCode user "${cleanUsername}" not found.`)
+        }
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('not found')) throw err
+      lastError = err instanceof Error ? err : new Error(String(err))
     }
 
-    const data = await res.json()
-    if (data.status === 'error' || data.message === 'user does not exist') {
-      throw new Error(`LeetCode user "${cleanUsername}" not found.`)
+    // Endpoint 2: alfa-leetcode-api
+    if (!rawData) {
+      try {
+        const res = await fetch(`https://alfa-leetcode-api.onrender.com/userProfile/${cleanUsername}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data && !data.errors) {
+            rawData = {
+              ranking: data.ranking || 0,
+              totalSolved: data.totalSolved || (data.easySolved || 0) + (data.mediumSolved || 0) + (data.hardSolved || 0),
+              easySolved: data.easySolved || 0,
+              mediumSolved: data.mediumSolved || 0,
+              hardSolved: data.hardSolved || 0,
+              acceptanceRate: data.acceptanceRate || 0,
+              submissionCalendar: data.submissionCalendar,
+            }
+          }
+        }
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
     }
 
-    const submissions = parseSubmissionCalendar(data.submissionCalendar)
+    // Endpoint 3: leetcode-api-faisalshohag
+    if (!rawData) {
+      try {
+        const res = await fetch(`https://leetcode-api-faisalshohag.vercel.app/${cleanUsername}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data && data.totalSolved !== undefined) {
+            rawData = {
+              ranking: data.ranking || 0,
+              totalSolved: data.totalSolved || 0,
+              easySolved: data.easySolved || 0,
+              mediumSolved: data.mediumSolved || 0,
+              hardSolved: data.hardSolved || 0,
+              acceptanceRate: data.acceptanceRate || 0,
+              submissionCalendar: data.submissionCalendar,
+            }
+          }
+        }
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+      }
+    }
+
+    if (!rawData) {
+      // Check if we have cached data to return gracefully
+      const cached = await this.getCachedData()
+      if (cached && cached.username.toLowerCase() === cleanUsername.toLowerCase()) {
+        return cached
+      }
+      throw new Error(
+        lastError?.message || `Unable to reach LeetCode API for "${cleanUsername}". Please check the username or try again shortly.`,
+      )
+    }
+
+    const submissions = parseSubmissionCalendar(rawData.submissionCalendar)
     const { currentStreak, longestStreak } = calculateLeetCodeStreak(submissions)
 
     const profile: LeetCodeProfileData = {
       username: cleanUsername,
-      ranking: data.ranking || 0,
-      totalSolved: data.totalSolved || 0,
-      easySolved: data.easySolved || 0,
-      mediumSolved: data.mediumSolved || 0,
-      hardSolved: data.hardSolved || 0,
-      acceptanceRate: data.acceptanceRate || 0,
+      ranking: Number(rawData.ranking) || 0,
+      totalSolved: Number(rawData.totalSolved) || 0,
+      easySolved: Number(rawData.easySolved) || 0,
+      mediumSolved: Number(rawData.mediumSolved) || 0,
+      hardSolved: Number(rawData.hardSolved) || 0,
+      acceptanceRate: Number(rawData.acceptanceRate) || 0,
       currentStreak,
       longestStreak,
       submissions,

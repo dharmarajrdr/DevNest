@@ -25,27 +25,47 @@ export function Modal({
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
+  const openPrevRef = useRef(false)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   // Keyboard accessibility: Escape closes, Tab is trapped inside the
   // dialog while it's open, and focus returns to whatever triggered the
-  // modal once it closes — a sighted mouse user never notices any of
-  // this, but it's the difference between usable and unusable for
-  // someone navigating by keyboard or screen reader.
+  // modal once it closes.
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      if (openPrevRef.current) {
+        openPrevRef.current = false
+        previouslyFocused.current?.focus()
+      }
+      return
+    }
 
-    previouslyFocused.current = document.activeElement as HTMLElement | null
+    const isFirstOpen = !openPrevRef.current
+    openPrevRef.current = true
 
-    const panel = panelRef.current
-    const focusable = panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-    const first = focusable?.[0]
-      ; (first ?? panel)?.focus()
+    if (isFirstOpen) {
+      previouslyFocused.current = document.activeElement as HTMLElement | null
+
+      // Delay slightly to let children render, then focus first input or panel if nothing inside is focused
+      requestAnimationFrame(() => {
+        const panel = panelRef.current
+        if (panel && !panel.contains(document.activeElement)) {
+          const autoFocusEl = panel.querySelector<HTMLElement>('[autofocus]')
+          const firstInput = panel.querySelector<HTMLElement>('input:not([disabled]), textarea:not([disabled]), select:not([disabled])')
+          const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+          const target = autoFocusEl ?? firstInput ?? focusable?.[0] ?? panel
+          target?.focus()
+        }
+      })
+    }
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
         return
       }
+      const panel = panelRef.current
       if (e.key !== 'Tab' || !panel) return
 
       const nodes = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
@@ -65,9 +85,8 @@ export function Modal({
     window.addEventListener('keydown', onKeyDown)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
-      previouslyFocused.current?.focus()
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 

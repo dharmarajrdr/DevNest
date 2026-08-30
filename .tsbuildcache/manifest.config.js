@@ -29,7 +29,13 @@ export default defineManifest({
         'identity', // Google sign-in (chrome.identity.getAuthToken) for account sync
     ],
     host_permissions: [
-        'https://www.googleapis.com/*', // Drive appDataFolder + userinfo, both used only for sync
+        'https://www.googleapis.com/*', // Drive appDataFolder + userinfo
+        'https://api.github.com/*', // GitHub API
+        'https://github-contributions-api.jogruber.de/*', // GitHub contributions calendar
+        'https://leetcode.com/*', // LeetCode GraphQL & public endpoints
+        'https://leetcode-stats-api.herokuapp.com/*', // LeetCode stats mirror
+        'https://alfa-leetcode-api.onrender.com/*', // LeetCode stats fallback
+        'https://*/*', // Favicons and external developer endpoints
     ],
     oauth2: {
         // Placeholder — replace with a real OAuth 2.0 Client ID (type "Chrome

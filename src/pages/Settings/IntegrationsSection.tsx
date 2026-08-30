@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { CheckCircle2, Code2, ExternalLink, Github, Key, Save, User } from 'lucide-react'
+import { CheckCircle2, Code2, ExternalLink, Github, Save, User } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useSettingsStore } from '@/store/useSettingsStore'
 
 export function IntegrationsSection() {
   const { settings, update } = useSettingsStore()
   const [githubUser, setGithubUser] = useState(settings.integrations?.githubUsername || '')
-  const [githubToken, setGithubToken] = useState(settings.integrations?.githubToken || '')
   const [leetcodeUser, setLeetcodeUser] = useState(settings.integrations?.leetcodeUsername || '')
   const [savedSuccess, setSavedSuccess] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -18,7 +17,6 @@ export function IntegrationsSection() {
       await update({
         integrations: {
           githubUsername: githubUser.trim(),
-          githubToken: githubToken.trim(),
           leetcodeUsername: leetcodeUser.trim(),
         },
       })
@@ -57,42 +55,21 @@ export function IntegrationsSection() {
           )}
         </div>
 
-        <div className="space-y-2.5">
-          <div>
-            <label htmlFor="settings-gh-user" className="mb-1 block text-xs text-text-secondary">
-              GitHub Username
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary">
-                <User size={13} />
-              </div>
-              <input
-                id="settings-gh-user"
-                value={githubUser}
-                onChange={(e) => setGithubUser(e.target.value)}
-                placeholder="e.g. torvalds, octocat"
-                className="w-full rounded-lg border border-border bg-bg pl-8 pr-3 py-2 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent"
-              />
+        <div>
+          <label htmlFor="settings-gh-user" className="mb-1 block text-xs text-text-secondary">
+            GitHub Username
+          </label>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary">
+              <User size={13} />
             </div>
-          </div>
-
-          <div>
-            <label htmlFor="settings-gh-token" className="mb-1 block text-xs text-text-secondary">
-              Personal Access Token (Optional — for private contributions & higher API rate limits)
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary">
-                <Key size={13} />
-              </div>
-              <input
-                id="settings-gh-token"
-                type="password"
-                value={githubToken}
-                onChange={(e) => setGithubToken(e.target.value)}
-                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                className="w-full rounded-lg border border-border bg-bg pl-8 pr-3 py-2 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent"
-              />
-            </div>
+            <input
+              id="settings-gh-user"
+              value={githubUser}
+              onChange={(e) => setGithubUser(e.target.value)}
+              placeholder="e.g. torvalds, octocat"
+              className="w-full rounded-lg border border-border bg-bg pl-8 pr-3 py-2 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent"
+            />
           </div>
         </div>
       </div>

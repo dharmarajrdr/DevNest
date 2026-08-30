@@ -8,7 +8,6 @@ import {
   GitCommitHorizontal,
   Github,
   GitPullRequest,
-  Key,
   RefreshCw,
   Settings,
   Trophy,
@@ -40,11 +39,9 @@ export function GitHubWidget() {
   // Configuration modal state
   const [configOpen, setConfigOpen] = useState(false)
   const [ghUsernameInput, setGhUsernameInput] = useState('')
-  const [ghTokenInput, setGhTokenInput] = useState('')
   const [lcUsernameInput, setLcUsernameInput] = useState('')
 
   const githubUser = settings.integrations?.githubUsername || ''
-  const githubToken = settings.integrations?.githubToken || ''
   const leetcodeUser = settings.integrations?.leetcodeUsername || ''
 
   useEffect(() => {
@@ -59,17 +56,17 @@ export function GitHubWidget() {
 
   useEffect(() => {
     if (activeTab === 'github' && githubUser) {
-      loadGitHub(githubUser, githubToken)
+      loadGitHub(githubUser)
     } else if (activeTab === 'leetcode' && leetcodeUser) {
       loadLeetCode(leetcodeUser)
     }
-  }, [activeTab, githubUser, githubToken, leetcodeUser])
+  }, [activeTab, githubUser, leetcodeUser])
 
-  async function loadGitHub(username: string, token?: string) {
+  async function loadGitHub(username: string) {
     try {
       setLoading(true)
       setError(null)
-      const data = await GitHubService.fetchUserData(username, token)
+      const data = await GitHubService.fetchUserData(username)
       setGithubData(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch GitHub data.')
@@ -93,7 +90,6 @@ export function GitHubWidget() {
 
   function handleOpenConfig() {
     setGhUsernameInput(githubUser)
-    setGhTokenInput(githubToken)
     setLcUsernameInput(leetcodeUser)
     setConfigOpen(true)
   }
@@ -103,14 +99,13 @@ export function GitHubWidget() {
     const updated = {
       ...settings.integrations,
       githubUsername: ghUsernameInput.trim(),
-      githubToken: ghTokenInput.trim(),
       leetcodeUsername: lcUsernameInput.trim(),
     }
     await update({ integrations: updated })
     setConfigOpen(false)
 
     if (ghUsernameInput.trim()) {
-      loadGitHub(ghUsernameInput.trim(), ghTokenInput.trim())
+      loadGitHub(ghUsernameInput.trim())
     }
     if (lcUsernameInput.trim()) {
       loadLeetCode(lcUsernameInput.trim())
@@ -155,7 +150,7 @@ export function GitHubWidget() {
             icon={<RefreshCw size={14} className={cn(loading && 'animate-spin')} />}
             label="Refresh data"
             onClick={() => {
-              if (activeTab === 'github' && githubUser) loadGitHub(githubUser, githubToken)
+              if (activeTab === 'github' && githubUser) loadGitHub(githubUser)
               if (activeTab === 'leetcode' && leetcodeUser) loadLeetCode(leetcodeUser)
             }}
           />
@@ -412,23 +407,6 @@ export function GitHubWidget() {
               value={ghUsernameInput}
               onChange={(e) => setGhUsernameInput(e.target.value)}
               placeholder="e.g. torvalds, dharmarajrdr..."
-              className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-accent"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="cfg-github-token"
-              className="mb-1 block text-xs font-semibold text-text-primary flex items-center gap-1.5"
-            >
-              <Key size={13} /> GitHub Token (Optional for higher rate limits / private repos)
-            </label>
-            <input
-              id="cfg-github-token"
-              type="password"
-              value={ghTokenInput}
-              onChange={(e) => setGhTokenInput(e.target.value)}
-              placeholder="ghp_xxxxxxxxxxxx"
               className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-accent"
             />
           </div>

@@ -35,6 +35,9 @@ function domainName(url: string): string {
   }
 }
 
+import { StorageService } from '@/services/storage/StorageService'
+
+const SORT_KEY = 'devtab.shortcutSortOrder'
 type SortOrder = 'default' | 'name-asc' | 'name-desc'
 
 export function ShortcutsWidget() {
@@ -47,13 +50,20 @@ export function ShortcutsWidget() {
 
   useEffect(() => {
     load()
+    StorageService.get<SortOrder>(SORT_KEY).then((saved) => {
+      if (saved) setSortOrder(saved)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function cycleSort() {
-    if (sortOrder === 'default') setSortOrder('name-asc')
-    else if (sortOrder === 'name-asc') setSortOrder('name-desc')
-    else setSortOrder('default')
+    let next: SortOrder = 'default'
+    if (sortOrder === 'default') next = 'name-asc'
+    else if (sortOrder === 'name-asc') next = 'name-desc'
+    else next = 'default'
+
+    setSortOrder(next)
+    StorageService.set(SORT_KEY, next)
   }
 
   // Unique list of categories present in shortcuts

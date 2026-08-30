@@ -193,7 +193,6 @@ export interface FocusSessionLogEntry {
 
 export interface DeveloperIntegrations {
   githubUsername?: string
-  githubToken?: string
   leetcodeUsername?: string
 }
 
@@ -332,5 +331,5 @@ export const DEFAULT_SETTINGS: Settings = {
   clock: { use24Hour: false, showSeconds: false, showDate: true },
   notifications: { enabled: true, notifyAtDueTime: true, notifyMinutesBefore: 0 },
   background: { enabled: false, imageUrl: null, opacity: 0.5, blurPx: 0, overlayIntensity: 0.6 },
-  integrations: { githubUsername: '', githubToken: '', leetcodeUsername: '' },
+  integrations: { githubUsername: '', leetcodeUsername: '' },
 }

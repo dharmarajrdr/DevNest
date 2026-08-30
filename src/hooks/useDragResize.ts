@@ -36,35 +36,62 @@ export function useDragResize(config: WidgetConfig, gridRef: RefObject<HTMLDivEl
     const startClientX = e.clientX
     const startClientY = e.clientY
     const startRect: Rect = { x: config.x, y: config.y, w: config.w, h: config.h }
+    let lastRect: Rect = startRect
+    let rafId: number | null = null
 
     function onMove(ev: PointerEvent) {
-      const deltaCols = Math.round((ev.clientX - startClientX) / m!.colStep)
-      const deltaRows = Math.round((ev.clientY - startClientY) / m!.rowStep)
+      if (rafId !== null) return
 
-      if (mode === 'move') {
-        setPreview({
-          x: clamp(startRect.x + deltaCols, 0, GRID_COLUMNS - startRect.w),
-          y: clamp(startRect.y + deltaRows, 0, MAX_ROWS - startRect.h),
-          w: startRect.w,
-          h: startRect.h,
-        })
-      } else {
-        setPreview({
-          x: startRect.x,
-          y: startRect.y,
-          w: clamp(startRect.w + deltaCols, 2, GRID_COLUMNS - startRect.x),
-          h: clamp(startRect.h + deltaRows, 2, MAX_ROWS - startRect.y),
-        })
-      }
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        const deltaCols = Math.round((ev.clientX - startClientX) / m!.colStep)
+        const deltaRows = Math.round((ev.clientY - startClientY) / m!.rowStep)
+
+        let newRect: Rect
+        if (mode === 'move') {
+          newRect = {
+            x: clamp(startRect.x + deltaCols, 0, GRID_COLUMNS - startRect.w),
+            y: clamp(startRect.y + deltaRows, 0, MAX_ROWS - startRect.h),
+            w: startRect.w,
+            h: startRect.h,
+          }
+        } else {
+          newRect = {
+            x: startRect.x,
+            y: startRect.y,
+            w: clamp(startRect.w + deltaCols, 2, GRID_COLUMNS - startRect.x),
+            h: clamp(startRect.h + deltaRows, 2, MAX_ROWS - startRect.y),
+          }
+        }
+
+        if (
+          newRect.x !== lastRect.x ||
+          newRect.y !== lastRect.y ||
+          newRect.w !== lastRect.w ||
+          newRect.h !== lastRect.h
+        ) {
+          lastRect = newRect
+          setPreview(newRect)
+        }
+      })
     }
 
     function onUp() {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId)
+        rafId = null
+      }
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
-      setPreview((current) => {
-        if (current) void updateWidgetRect(config.id, current)
-        return null
-      })
+      setPreview(null)
+      if (
+        lastRect.x !== startRect.x ||
+        lastRect.y !== startRect.y ||
+        lastRect.w !== startRect.w ||
+        lastRect.h !== startRect.h
+      ) {
+        void updateWidgetRect(config.id, lastRect)
+      }
     }
 
     window.addEventListener('pointermove', onMove)

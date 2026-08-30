@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { clamp, overlapsAny, rectsOverlap } from './grid'
+import { clamp, overlapsAny, rectsOverlap, resolveCollisions } from './grid'
 import type { WidgetConfig } from '@/types'
 
 function tile(id: string, x: number, y: number, w: number, h: number): WidgetConfig {
@@ -42,5 +42,38 @@ describe('clamp', () => {
   })
   it('clamps above the maximum', () => {
     expect(clamp(20, 0, 10)).toBe(10)
+  })
+})
+
+describe('resolveCollisions', () => {
+  it('pushes colliding widget down when moved widget lands on its position', () => {
+    const layout = [tile('a', 0, 0, 4, 2), tile('b', 0, 2, 4, 2)]
+    // Move 'b' to (0, 0) overlapping 'a'
+    const next = resolveCollisions('b', { x: 0, y: 0, w: 4, h: 2 }, layout)
+    const b = next.find((w) => w.id === 'b')
+    const a = next.find((w) => w.id === 'a')
+    expect(b?.x).toBe(0)
+    expect(b?.y).toBe(0)
+    expect(a?.y).toBe(2) // 'a' was pushed down below 'b'
+  })
+
+  it('cascades collisions down multiple overlapping widgets', () => {
+    const layout = [
+      tile('a', 0, 0, 4, 2),
+      tile('b', 0, 2, 4, 2),
+      tile('c', 0, 4, 4, 2),
+    ]
+    // Move new widget 'd' to (0, 0)
+    const withD = [...layout, tile('d', 0, 10, 4, 2)]
+    const next = resolveCollisions('d', { x: 0, y: 0, w: 4, h: 2 }, withD)
+    const d = next.find((w) => w.id === 'd')
+    const a = next.find((w) => w.id === 'a')
+    const b = next.find((w) => w.id === 'b')
+    const c = next.find((w) => w.id === 'c')
+
+    expect(d?.y).toBe(0)
+    expect(a?.y).toBe(2)
+    expect(b?.y).toBe(4)
+    expect(c?.y).toBe(6)
   })
 })
