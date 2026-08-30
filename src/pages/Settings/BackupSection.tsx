@@ -207,6 +207,7 @@ export function BackupSection() {
               disabled={importing}
               onClick={() => fileInputRef.current?.click()}
               className="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white"
+              style={{ textWrap: 'nowrap' }}
             >
               {importing ? (
                 <>
