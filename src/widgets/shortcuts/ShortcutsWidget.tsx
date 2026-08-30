@@ -1,11 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Folder, Globe, Link2, Plus, Trash2 } from 'lucide-react'
+import {
+  ArrowDownAZ,
+  ArrowUpDown,
+  ArrowUpZA,
+  Folder,
+  Globe,
+  Link2,
+  Plus,
+  Trash2,
+} from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { IconButton } from '@/components/ui/IconButton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { ShortcutFormModal } from './ShortcutFormModal'
 import { useShortcutStore } from '@/store/useShortcutStore'
 import { cn } from '@/utils/cn'
+import type { Shortcut } from '@/types'
 
 function faviconUrl(url: string): string {
   try {
@@ -24,16 +35,26 @@ function domainName(url: string): string {
   }
 }
 
+type SortOrder = 'default' | 'name-asc' | 'name-desc'
+
 export function ShortcutsWidget() {
   const { shortcuts, load, loading, remove } = useShortcutStore()
   const [formOpen, setFormOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [modalInitialCategory, setModalInitialCategory] = useState<string>('AI Tools')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('default')
+  const [deletingShortcut, setDeletingShortcut] = useState<Shortcut | null>(null)
 
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function cycleSort() {
+    if (sortOrder === 'default') setSortOrder('name-asc')
+    else if (sortOrder === 'name-asc') setSortOrder('name-desc')
+    else setSortOrder('default')
+  }
 
   // Unique list of categories present in shortcuts
   const activeCategories = useMemo(() => {
@@ -44,20 +65,40 @@ export function ShortcutsWidget() {
     return Array.from(set).sort()
   }, [shortcuts])
 
-  // Grouped shortcuts mapping
+  // Grouped shortcuts mapping with sorting applied
   const groupedShortcuts = useMemo(() => {
-    const map = new Map<string, typeof shortcuts>()
+    const map = new Map<string, Shortcut[]>()
     for (const s of shortcuts) {
       const cat = s.category || 'General'
       if (!map.has(cat)) map.set(cat, [])
       map.get(cat)!.push(s)
     }
+
+    if (sortOrder !== 'default') {
+      for (const [cat, list] of map.entries()) {
+        map.set(
+          cat,
+          [...list].sort((a, b) => {
+            const cmp = a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+            return sortOrder === 'name-asc' ? cmp : -cmp
+          }),
+        )
+      }
+    }
+
     return map
-  }, [shortcuts])
+  }, [shortcuts, sortOrder])
 
   function handleOpenCreate(category?: string) {
     setModalInitialCategory(category || (selectedCategory !== 'All' ? selectedCategory : 'AI Tools'))
     setFormOpen(true)
+  }
+
+  async function handleConfirmDelete() {
+    if (deletingShortcut) {
+      await remove(deletingShortcut.id)
+      setDeletingShortcut(null)
+    }
   }
 
   return (
@@ -69,11 +110,32 @@ export function ShortcutsWidget() {
             {shortcuts.length} links
           </span>
         </div>
-        <IconButton
-          icon={<Plus size={16} />}
-          label="Add shortcut"
-          onClick={() => handleOpenCreate()}
-        />
+        <div className="flex items-center gap-1">
+          <IconButton
+            icon={
+              sortOrder === 'name-asc' ? (
+                <ArrowDownAZ size={16} className="text-accent" />
+              ) : sortOrder === 'name-desc' ? (
+                <ArrowUpZA size={16} className="text-accent" />
+              ) : (
+                <ArrowUpDown size={16} />
+              )
+            }
+            label={
+              sortOrder === 'name-asc'
+                ? 'Sorted A-Z (Click for Z-A)'
+                : sortOrder === 'name-desc'
+                  ? 'Sorted Z-A (Click for Default)'
+                  : 'Sort by name (A-Z)'
+            }
+            onClick={cycleSort}
+          />
+          <IconButton
+            icon={<Plus size={16} />}
+            label="Add shortcut"
+            onClick={() => handleOpenCreate()}
+          />
+        </div>
       </CardHeader>
 
       {/* Category Pills Tab Bar */}
@@ -168,7 +230,11 @@ export function ShortcutsWidget() {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {items.map((s) => (
-                    <ShortcutCard key={s.id} shortcut={s} onRemove={remove} />
+                    <ShortcutCard
+                      key={s.id}
+                      shortcut={s}
+                      onDeleteRequest={(shortcut) => setDeletingShortcut(shortcut)}
+                    />
                   ))}
                 </div>
               </div>
@@ -196,7 +262,11 @@ export function ShortcutsWidget() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {(groupedShortcuts.get(selectedCategory) ?? []).map((s) => (
-                <ShortcutCard key={s.id} shortcut={s} onRemove={remove} />
+                <ShortcutCard
+                  key={s.id}
+                  shortcut={s}
+                  onDeleteRequest={(shortcut) => setDeletingShortcut(shortcut)}
+                />
               ))}
             </div>
           </div>
@@ -208,16 +278,26 @@ export function ShortcutsWidget() {
         onClose={() => setFormOpen(false)}
         initialCategory={modalInitialCategory}
       />
+
+      <ConfirmModal
+        open={!!deletingShortcut}
+        title="Delete shortcut?"
+        message="Are you sure you want to delete this shortcut link?"
+        itemName={deletingShortcut?.title}
+        confirmLabel="Delete shortcut"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeletingShortcut(null)}
+      />
     </Card>
   )
 }
 
 function ShortcutCard({
   shortcut: s,
-  onRemove,
+  onDeleteRequest,
 }: {
-  shortcut: { id: string; title: string; url: string; category?: string }
-  onRemove: (id: string) => void
+  shortcut: Shortcut
+  onDeleteRequest: (shortcut: Shortcut) => void
 }) {
   const [imgError, setImgError] = useState(false)
 
@@ -252,7 +332,7 @@ function ShortcutCard({
       </a>
       <button
         aria-label={`Remove ${s.title}`}
-        onClick={() => onRemove(s.id)}
+        onClick={() => onDeleteRequest(s)}
         className="absolute right-1 top-1 hidden rounded p-1 text-text-secondary hover:bg-danger/10 hover:text-danger group-hover:block transition-colors"
       >
         <Trash2 size={12} />

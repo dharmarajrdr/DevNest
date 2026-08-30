@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   Cloud,
   Database,
+  Code2,
   Keyboard,
   Info,
   Check,
@@ -29,6 +30,7 @@ import { theme } from '@/config/theme'
 import { WIDGET_REGISTRY } from '@/widgets/registry'
 import { SyncSection } from './SyncSection'
 import { BackupSection } from './BackupSection'
+import { IntegrationsSection } from './IntegrationsSection'
 import { cn } from '@/utils/cn'
 
 interface Props {
@@ -41,6 +43,7 @@ type TabKey =
   | 'clock'
   | 'notifications'
   | 'dashboard'
+  | 'integrations'
   | 'sync'
   | 'backup'
   | 'shortcuts'
@@ -82,6 +85,13 @@ const TABS: TabConfig[] = [
     icon: LayoutGrid,
     badgeColor: 'text-emerald-400',
     badgeBg: 'bg-emerald-500/10',
+  },
+  {
+    key: 'integrations',
+    label: 'Developer Accounts',
+    icon: Code2,
+    badgeColor: 'text-amber-400',
+    badgeBg: 'bg-amber-500/10',
   },
   {
     key: 'sync',
@@ -564,6 +574,9 @@ export function SettingsPanel({ open, onClose }: Props) {
             </div>
           </div>
         )}
+
+        {/* Developer Integrations Tab */}
+        {activeTab === 'integrations' && <IntegrationsSection />}
 
         {/* Sync Tab */}
         {activeTab === 'sync' && <SyncSection />}

@@ -189,7 +189,58 @@ export interface FocusSessionLogEntry {
   completedAt: string // ISO datetime
 }
 
-// ── GitHub (placeholder — see services/github/GitHubService.ts) ───────
+// ── Developer Accounts & Integrations ─────────────────────────────────
+
+export interface DeveloperIntegrations {
+  githubUsername?: string
+  githubToken?: string
+  leetcodeUsername?: string
+}
+
+export interface GitHubContributionDay {
+  date: string // "YYYY-MM-DD"
+  count: number
+  level: 0 | 1 | 2 | 3 | 4
+}
+
+export interface GitHubProfileData {
+  username: string
+  name: string
+  avatarUrl: string
+  bio?: string
+  publicRepos: number
+  followers: number
+  totalContributions: number
+  currentStreak: number
+  longestStreak: number
+  contributions: GitHubContributionDay[]
+  commits: number
+  pullRequests: number
+  issues: number
+  lastFetched: string
+}
+
+export interface LeetCodeSubmissionDay {
+  date: string // "YYYY-MM-DD"
+  count: number
+  level: 0 | 1 | 2 | 3 | 4
+}
+
+export interface LeetCodeProfileData {
+  username: string
+  realName?: string
+  avatarUrl?: string
+  ranking: number
+  totalSolved: number
+  easySolved: number
+  mediumSolved: number
+  hardSolved: number
+  acceptanceRate: number
+  currentStreak: number
+  longestStreak: number
+  submissions: LeetCodeSubmissionDay[]
+  lastFetched: string
+}
 
 export interface GitHubActivitySummary {
   username: string
@@ -273,6 +324,7 @@ export interface Settings {
   clock: ClockSettings
   notifications: NotificationSettings
   background: BackgroundSettings
+  integrations?: DeveloperIntegrations
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -280,4 +332,5 @@ export const DEFAULT_SETTINGS: Settings = {
   clock: { use24Hour: false, showSeconds: false, showDate: true },
   notifications: { enabled: true, notifyAtDueTime: true, notifyMinutesBefore: 0 },
   background: { enabled: false, imageUrl: null, opacity: 0.5, blurPx: 0, overlayIntensity: 0.6 },
+  integrations: { githubUsername: '', githubToken: '', leetcodeUsername: '' },
 }

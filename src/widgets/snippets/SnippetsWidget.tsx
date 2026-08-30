@@ -4,15 +4,18 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { IconButton } from '@/components/ui/IconButton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Badge } from '@/components/ui/Badge'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CopyIconButton } from '@/widgets/devtools/tools/ToolPrimitives'
 import { SnippetFormModal } from './SnippetFormModal'
 import { useSnippetStore } from '@/store/useSnippetStore'
 import { cn } from '@/utils/cn'
+import type { Snippet } from '@/types'
 
 export function SnippetsWidget() {
   const { snippets, load, loading, remove, toggleFavorite } = useSnippetStore()
   const [formOpen, setFormOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [deletingSnippet, setDeletingSnippet] = useState<Snippet | null>(null)
 
   useEffect(() => {
     load()
@@ -78,7 +81,11 @@ export function SnippetsWidget() {
                     <Star size={13} fill={s.favorite ? 'currentColor' : 'none'} />
                   </button>
                   <CopyIconButton value={s.code} />
-                  <IconButton icon={<Trash2 size={13} />} label="Delete snippet" onClick={() => remove(s.id)} />
+                  <IconButton
+                    icon={<Trash2 size={13} />}
+                    label="Delete snippet"
+                    onClick={() => setDeletingSnippet(s)}
+                  />
                 </div>
               </div>
               <Badge className="mt-1">{s.category}</Badge>
@@ -88,6 +95,21 @@ export function SnippetsWidget() {
       </div>
 
       <SnippetFormModal open={formOpen} onClose={() => setFormOpen(false)} />
+
+      <ConfirmModal
+        open={!!deletingSnippet}
+        title="Delete snippet?"
+        message="Are you sure you want to delete this code snippet?"
+        itemName={deletingSnippet?.title}
+        confirmLabel="Delete snippet"
+        onConfirm={async () => {
+          if (deletingSnippet) {
+            await remove(deletingSnippet.id)
+            setDeletingSnippet(null)
+          }
+        }}
+        onCancel={() => setDeletingSnippet(null)}
+      />
     </Card>
   )
 }
