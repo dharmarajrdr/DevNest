@@ -1,18 +1,28 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { IconButton } from './IconButton'
+import { cn } from '@/utils/cn'
 
 interface ModalProps {
   open: boolean
   onClose: () => void
   title: string
   children: ReactNode
+  maxWidth?: string
+  bodyClassName?: string
 }
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  maxWidth = 'max-w-md',
+  bodyClassName = 'p-5',
+}: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
 
@@ -29,7 +39,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     const panel = panelRef.current
     const focusable = panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
     const first = focusable?.[0]
-    ;(first ?? panel)?.focus()
+      ; (first ?? panel)?.focus()
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
@@ -63,7 +73,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-[12vh] backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-[6vh] pb-[6vh] px-4 backdrop-blur-sm overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -72,16 +82,19 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="w-full max-w-md rounded-card border border-border bg-surface-elevated shadow-card"
+        className={cn(
+          'w-full rounded-card border border-border bg-surface-elevated shadow-card my-auto max-h-[88vh] flex flex-col',
+          maxWidth,
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3 shrink-0">
           <h2 id="modal-title" className="text-sm font-semibold">
             {title}
           </h2>
           <IconButton icon={<X size={16} />} label="Close" onClick={onClose} />
         </div>
-        <div className="p-5">{children}</div>
+        <div className={cn('overflow-y-auto flex-1', bodyClassName)}>{children}</div>
       </div>
     </div>
   )
