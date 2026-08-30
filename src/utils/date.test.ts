@@ -11,6 +11,7 @@ import {
   isTodayTask,
   isUpcoming,
   isUpcomingTask,
+  isValidTimeRange,
   shiftISODate,
   todayISO,
 } from './date'
@@ -216,13 +217,56 @@ describe('formatTaskTimeframe', () => {
   })
 })
 
+describe('isValidTimeRange', () => {
+  it('is valid when start time is earlier or equal to end time', () => {
+    expect(isValidTimeRange('09:00', '10:00')).toBe(true)
+    expect(isValidTimeRange('14:30', '14:30')).toBe(true)
+    expect(isValidTimeRange(undefined, '10:00')).toBe(true)
+    expect(isValidTimeRange('09:00', undefined)).toBe(true)
+  })
+
+  it('is invalid when start time is strictly later than end time', () => {
+    expect(isValidTimeRange('16:00', '14:00')).toBe(false)
+    expect(isValidTimeRange('23:00', '08:00')).toBe(false)
+  })
+})
+
+describe('computeNextDueDate with daysOfMonth', () => {
+  it('advances to next day in same month when available', () => {
+    expect(
+      computeNextDueDate('2026-08-05', {
+        type: 'MONTHLY',
+        daysOfMonth: [1, 15],
+      }),
+    ).toBe('2026-08-15')
+  })
+
+  it('advances to next month first day when passed last day of current month', () => {
+    expect(
+      computeNextDueDate('2026-08-20', {
+        type: 'MONTHLY',
+        daysOfMonth: [1, 15],
+      }),
+    ).toBe('2026-09-01')
+  })
+})
+
 describe('computeNextTimeframe', () => {
   it('preserves multi-day duration across recurring cycles', () => {
     const next = computeNextTimeframe('2026-08-30', '2026-09-02', {
       type: 'WEEKLY',
       interval: 1,
     })
-    expect(next.startDate).toBe('2026-09-06')
-    expect(next.endDate).toBe('2026-09-09')
+    expect(next?.startDate).toBe('2026-09-06')
+    expect(next?.endDate).toBe('2026-09-09')
+  })
+
+  it('returns null when next recurrence exceeds recurrence.endDate', () => {
+    const next = computeNextTimeframe('2026-08-30', '2026-08-30', {
+      type: 'WEEKLY',
+      interval: 1,
+      endDate: '2026-09-01',
+    })
+    expect(next).toBeNull()
   })
 })

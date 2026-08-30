@@ -108,4 +108,21 @@ describe('TodoRepository', () => {
     expect(nextTask?.endDate).toBeTruthy()
     expect(nextTask?.startDate).not.toBe(today)
   })
+
+  it('stops generating next recurring occurrence if past recurrence.endDate', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+    const todo = await TodoRepository.create({
+      title: 'Temporary Daily Sync',
+      startDate: today,
+      endDate: today,
+      recurrence: { type: 'DAILY', interval: 1, endDate: today },
+    })
+
+    const completed = await TodoRepository.complete(todo.id)
+    expect(completed?.status).toBe('COMPLETED')
+
+    const all = await TodoRepository.getAll()
+    // Should NOT have created a new occurrence since next date > endDate
+    expect(all).toHaveLength(1)
+  })
 })

@@ -177,10 +177,15 @@ export function formatDueLabel(todo: Todo): string {
   return formatTaskTimeframe(todo)
 }
 
+export function isValidTimeRange(startTime?: string, endTime?: string): boolean {
+  if (!startTime || !endTime) return true
+  return startTime <= endTime
+}
+
 export function computeNextDueDate(baseDateISO: string | undefined, recurrence: RecurrenceConfig): string {
   const base = baseDateISO || todayISO()
   const interval = Math.max(1, recurrence.interval ?? 1)
-  const { type, unit, daysOfWeek } = recurrence
+  const { type, unit, daysOfWeek, daysOfMonth } = recurrence
 
   if (type === 'DAILY') {
     return shiftISODate(base, interval)
@@ -194,6 +199,9 @@ export function computeNextDueDate(baseDateISO: string | undefined, recurrence: 
   }
 
   if (type === 'MONTHLY') {
+    if (daysOfMonth && daysOfMonth.length > 0) {
+      return getNextDayOfMonthDate(base, daysOfMonth, interval)
+    }
     return addMonthsToISODate(base, interval)
   }
 
@@ -209,6 +217,9 @@ export function computeNextDueDate(baseDateISO: string | undefined, recurrence: 
       return shiftISODate(base, 7 * interval)
     }
     if (customUnit === 'month') {
+      if (daysOfMonth && daysOfMonth.length > 0) {
+        return getNextDayOfMonthDate(base, daysOfMonth, interval)
+      }
       return addMonthsToISODate(base, interval)
     }
   }
@@ -220,14 +231,19 @@ export function computeNextTimeframe(
   startDate: string | undefined,
   endDate: string | undefined,
   recurrence: RecurrenceConfig,
-): { startDate?: string; endDate?: string } {
+): { startDate?: string; endDate?: string } | null {
   if (!startDate && !endDate) {
     const next = computeNextDueDate(todayISO(), recurrence)
+    if (recurrence.endDate && next > recurrence.endDate) return null
     return { startDate: next, endDate: next }
   }
 
   const baseStart = startDate || endDate
   const nextStart = computeNextDueDate(baseStart, recurrence)
+
+  if (recurrence.endDate && nextStart > recurrence.endDate) {
+    return null
+  }
 
   if (!startDate || !endDate || startDate === endDate) {
     return {
@@ -265,7 +281,6 @@ function getNextDayOfWeekDate(baseISO: string, daysOfWeek: number[], intervalWee
   const currentDayOfWeek = baseDate.getUTCDay()
 
   const sortedDays = [...daysOfWeek].sort((a, b) => a - b)
-  // Check if there is a later day in the same week
   const nextDayInSameWeek = sortedDays.find((day) => day > currentDayOfWeek)
 
   if (nextDayInSameWeek !== undefined) {
@@ -273,38 +288,79 @@ function getNextDayOfWeekDate(baseISO: string, daysOfWeek: number[], intervalWee
     return shiftISODate(baseISO, diff)
   }
 
-  // Otherwise, advance by intervalWeeks weeks to the first selected day of the week
   const firstDay = sortedDays[0]
   const daysUntilEndOfWeek = 7 - currentDayOfWeek
   const additionalDays = (intervalWeeks - 1) * 7 + firstDay
   return shiftISODate(baseISO, daysUntilEndOfWeek + additionalDays)
 }
 
+function getNextDayOfMonthDate(baseISO: string, daysOfMonth: number[], intervalMonths: number): string {
+  const [y, m, d] = baseISO.split('-').map(Number)
+  const sortedDays = [...daysOfMonth].sort((a, b) => a - b)
+
+  const nextDayInSameMonth = sortedDays.find((day) => day > d)
+  if (nextDayInSameMonth !== undefined) {
+    const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate()
+    const targetDay = Math.min(nextDayInSameMonth, daysInMonth)
+    const newDate = new Date(Date.UTC(y, m - 1, targetDay))
+    return newDate.toISOString().slice(0, 10)
+  }
+
+  const firstDay = sortedDays[0]
+  let newYear = y
+  let newMonth = m - 1 + intervalMonths
+  newYear += Math.floor(newMonth / 12)
+  newMonth = ((newMonth % 12) + 12) % 12
+  const daysInNewMonth = new Date(Date.UTC(newYear, newMonth + 1, 0)).getUTCDate()
+  const targetDay = Math.min(firstDay, daysInNewMonth)
+  const newDate = new Date(Date.UTC(newYear, newMonth, targetDay))
+  return newDate.toISOString().slice(0, 10)
+}
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (s[(v - 20) % 10] || s[v] || s[0])
+}
+
 export function formatRecurrenceLabel(recurrence?: RecurrenceConfig): string {
   if (!recurrence) return ''
-  const { type, interval = 1, unit, daysOfWeek } = recurrence
+  const { type, interval = 1, unit, daysOfWeek, daysOfMonth, endDate } = recurrence
   const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  let label = ''
 
   if (type === 'DAILY') {
-    return interval === 1 ? 'Daily' : `Every ${interval} days`
-  }
-  if (type === 'WEEKLY') {
+    label = interval === 1 ? 'Daily' : `Every ${interval} days`
+  } else if (type === 'WEEKLY') {
     if (daysOfWeek && daysOfWeek.length > 0 && daysOfWeek.length < 7) {
       const days = daysOfWeek.map((d) => DAY_NAMES[d]).join(', ')
-      return interval === 1 ? `Weekly on ${days}` : `Every ${interval} wks on ${days}`
+      label = interval === 1 ? `Weekly on ${days}` : `Every ${interval} wks on ${days}`
+    } else {
+      label = interval === 1 ? 'Weekly' : `Every ${interval} weeks`
     }
-    return interval === 1 ? 'Weekly' : `Every ${interval} weeks`
-  }
-  if (type === 'MONTHLY') {
-    return interval === 1 ? 'Monthly' : `Every ${interval} months`
-  }
-  if (type === 'CUSTOM') {
+  } else if (type === 'MONTHLY') {
+    if (daysOfMonth && daysOfMonth.length > 0) {
+      const days = daysOfMonth.map(ordinal).join(', ')
+      label = interval === 1 ? `Monthly on the ${days}` : `Every ${interval} mos on the ${days}`
+    } else {
+      label = interval === 1 ? 'Monthly' : `Every ${interval} months`
+    }
+  } else if (type === 'CUSTOM') {
     if (unit === 'week' && daysOfWeek && daysOfWeek.length > 0 && daysOfWeek.length < 7) {
       const days = daysOfWeek.map((d) => DAY_NAMES[d]).join(', ')
-      return interval === 1 ? `Every week on ${days}` : `Every ${interval} wks on ${days}`
+      label = interval === 1 ? `Every week on ${days}` : `Every ${interval} wks on ${days}`
+    } else if (unit === 'month' && daysOfMonth && daysOfMonth.length > 0) {
+      const days = daysOfMonth.map(ordinal).join(', ')
+      label = `Every ${interval} mos on the ${days}`
+    } else {
+      const unitLabel = (unit ?? 'day') + (interval > 1 ? 's' : '')
+      label = `Every ${interval} ${unitLabel}`
     }
-    const unitLabel = (unit ?? 'day') + (interval > 1 ? 's' : '')
-    return `Every ${interval} ${unitLabel}`
   }
-  return ''
+
+  if (endDate && label) {
+    label += ` until ${endDate}`
+  }
+
+  return label
 }

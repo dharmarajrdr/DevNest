@@ -54,4 +54,19 @@ describe('ShortcutRepository', () => {
     expect(updated?.title).toBe('Renamed')
     expect(updated?.updatedAt).not.toBe(before)
   })
+
+  it('persists shortcuts with custom categories like AI Tools and Readings', async () => {
+    const s1 = await ShortcutRepository.create({
+      title: 'ChatGPT',
+      url: 'https://chatgpt.com',
+      category: 'AI Tools',
+    })
+    const s2 = await ShortcutRepository.create({
+      title: 'Hacker News',
+      url: 'https://news.ycombinator.com',
+      category: 'Readings',
+    })
+    expect(s1.category).toBe('AI Tools')
+    expect(s2.category).toBe('Readings')
+  })
 })

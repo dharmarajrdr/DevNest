@@ -85,31 +85,34 @@ export const TodoRepository = {
 
     // If it's a recurring task, schedule the next occurrence
     if (todo.recurrence) {
-      const { startDate: nextStartDate, endDate: nextEndDate } = computeNextTimeframe(
+      const nextTimeframe = computeNextTimeframe(
         todo.startDate || todo.dueDate,
         todo.endDate || todo.dueDate,
         todo.recurrence,
       )
-      const nextRecurringTodo: Todo = {
-        id: generateId(),
-        title: todo.title,
-        description: todo.description,
-        status: 'TODO',
-        priority: todo.priority,
-        startDate: nextStartDate,
-        startTime: todo.startTime,
-        endDate: nextEndDate,
-        endTime: todo.endTime,
-        isAllDay: todo.isAllDay,
-        dueDate: nextEndDate,
-        dueTime: todo.endTime || todo.dueTime,
-        tags: todo.tags ?? [],
-        recurrence: todo.recurrence,
-        recurringParentId: todo.recurringParentId ?? todo.id,
-        createdAt: now,
-        updatedAt: now,
+      if (nextTimeframe) {
+        const { startDate: nextStartDate, endDate: nextEndDate } = nextTimeframe
+        const nextRecurringTodo: Todo = {
+          id: generateId(),
+          title: todo.title,
+          description: todo.description,
+          status: 'TODO',
+          priority: todo.priority,
+          startDate: nextStartDate,
+          startTime: todo.startTime,
+          endDate: nextEndDate,
+          endTime: todo.endTime,
+          isAllDay: todo.isAllDay,
+          dueDate: nextEndDate,
+          dueTime: todo.endTime || todo.dueTime,
+          tags: todo.tags ?? [],
+          recurrence: todo.recurrence,
+          recurringParentId: todo.recurringParentId ?? todo.id,
+          createdAt: now,
+          updatedAt: now,
+        }
+        nextTodos.push(nextRecurringTodo)
       }
-      nextTodos.push(nextRecurringTodo)
     }
 
     await saveAll(nextTodos)

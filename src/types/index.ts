@@ -11,6 +11,8 @@ export interface RecurrenceConfig {
   interval?: number // e.g. every 2 weeks (default: 1)
   unit?: RecurrenceUnit // for CUSTOM: 'day' | 'week' | 'month'
   daysOfWeek?: number[] // 0 (Sun) - 6 (Sat)
+  daysOfMonth?: number[] // 1 - 31 for Monthly recurrence
+  endDate?: string // ISO date "YYYY-MM-DD" when the recurrence series stops
 }
 
 export interface Todo {
@@ -56,12 +58,16 @@ export type TodoDraft = Pick<Todo, 'title'> &
 // ── Shortcuts ────────────────────────────────────────────────────────
 
 export type ShortcutCategory =
+  | 'Readings'
+  | 'Social'
+  | 'AI Tools'
   | 'Development'
   | 'Documentation'
   | 'Cloud'
   | 'Productivity'
   | 'Personal'
   | 'Custom'
+  | (string & {})
 
 export interface Shortcut {
   id: string

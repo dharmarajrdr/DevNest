@@ -26,6 +26,7 @@ export function TodoWidget() {
   const { todos, load, loading } = useTodoStore()
   const { taskFormOpen: formOpen, setTaskFormOpen: setFormOpen } = useUIStore()
   const [filter, setFilter] = useState<Filter>('today')
+  const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null)
 
   useEffect(() => {
     load()
@@ -49,6 +50,21 @@ export function TodoWidget() {
     }
   }, [todos, filter])
 
+  function handleOpenCreate() {
+    setEditingTodo(null)
+    setFormOpen(true)
+  }
+
+  function handleOpenEdit(todo: typeof todos[0]) {
+    setEditingTodo(todo)
+    setFormOpen(true)
+  }
+
+  function handleCloseModal() {
+    setEditingTodo(null)
+    setFormOpen(false)
+  }
+
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
@@ -60,7 +76,7 @@ export function TodoWidget() {
             </span>
           )}
         </div>
-        <IconButton icon={<Plus size={16} />} label="Add task" onClick={() => setFormOpen(true)} />
+        <IconButton icon={<Plus size={16} />} label="Add task" onClick={handleOpenCreate} />
       </CardHeader>
 
       <div className="flex gap-1 border-b border-border px-4 pb-2">
@@ -98,7 +114,7 @@ export function TodoWidget() {
               description="Plan your day and get things done."
               action={
                 <button
-                  onClick={() => setFormOpen(true)}
+                  onClick={handleOpenCreate}
                   className="text-xs font-medium text-accent hover:underline"
                 >
                   + Add task
@@ -106,12 +122,18 @@ export function TodoWidget() {
               }
             />
           ) : (
-            visible.map((todo) => <TodoItem key={todo.id} todo={todo} />)
+            visible.map((todo) => (
+              <TodoItem key={todo.id} todo={todo} onEdit={handleOpenEdit} />
+            ))
           )}
         </div>
       )}
 
-      <TodoFormModal open={formOpen} onClose={() => setFormOpen(false)} />
+      <TodoFormModal
+        open={formOpen}
+        onClose={handleCloseModal}
+        todoToEdit={editingTodo}
+      />
     </Card>
   )
 }

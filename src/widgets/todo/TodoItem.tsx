@@ -1,4 +1,4 @@
-import { Check, Repeat, RotateCcw, Trash2 } from 'lucide-react'
+import { Check, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
 import type { Todo } from '@/types'
 import { PriorityBadge } from '@/components/ui/Badge'
 import { IconButton } from '@/components/ui/IconButton'
@@ -6,7 +6,7 @@ import { cn } from '@/utils/cn'
 import { formatRecurrenceLabel, formatTaskTimeframe, isCompleteable, isOverdueTask } from '@/utils/date'
 import { useTodoStore } from '@/store/useTodoStore'
 
-export function TodoItem({ todo }: { todo: Todo }) {
+export function TodoItem({ todo, onEdit }: { todo: Todo; onEdit?: (todo: Todo) => void }) {
   const { complete, restore, remove } = useTodoStore()
   const overdue = isOverdueTask(todo)
   const completeable = isCompleteable(todo)
@@ -81,7 +81,14 @@ export function TodoItem({ todo }: { todo: Todo }) {
 
       {!done && <PriorityBadge priority={todo.priority} />}
 
-      <div className="flex opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        {!done && onEdit && (
+          <IconButton
+            icon={<Pencil size={13} />}
+            label="Edit task"
+            onClick={() => onEdit(todo)}
+          />
+        )}
         <IconButton
           icon={done ? <RotateCcw size={14} /> : <Trash2 size={14} />}
           label={done ? 'Restore task' : 'Delete task'}
