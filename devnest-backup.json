@@ -1,0 +1,849 @@
+{
+  "version": "0.4.0",
+  "exportedAt": "2026-08-30T12:20:21.587Z",
+  "exportScope": [
+    "data",
+    "layout"
+  ],
+  "todos": [],
+  "shortcuts": [
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:15:09.962Z",
+      "id": "4fccd89f-dc04-4526-a96d-0ac9902c685a",
+      "order": 0,
+      "title": "LinkedIn",
+      "updatedAt": "2026-08-30T07:15:09.962Z",
+      "url": "https://www.linkedin.com/in/dharmarajrathinavel/"
+    },
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:15:30.894Z",
+      "id": "5ddfc627-cd22-443e-b128-76ce79d216b4",
+      "order": 1,
+      "title": "LeetCode",
+      "updatedAt": "2026-08-30T07:15:30.894Z",
+      "url": "https://leetcode.com/u/dharmaraj_rathinavel/"
+    },
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:15:54.894Z",
+      "id": "1a5cd415-d910-4ffa-95fe-e57f997ae346",
+      "order": 2,
+      "title": "GitHub",
+      "updatedAt": "2026-08-30T07:15:54.894Z",
+      "url": "https://github.com/dharmarajrdr"
+    },
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:16:12.894Z",
+      "id": "fbaee326-3da7-4a7f-92d5-74789b07bf84",
+      "order": 3,
+      "title": "Resume",
+      "updatedAt": "2026-08-30T07:16:12.894Z",
+      "url": "https://tinyurl.com/Dharmaraj-SDE2-Resume"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:47:33.252Z",
+      "id": "e1df7c5d-1131-4b76-aea1-24d132ac4cab",
+      "order": 4,
+      "title": "Microsoft",
+      "updatedAt": "2026-08-30T07:47:33.252Z",
+      "url": "https://microsoft.eightfold.ai/careers?domain=microsoft.com&utm_source=saved_search_notification&profile_type=candidate&start=0&location=Bengaluru%2C++KA%2C++India&pid=1970393556918245&sort_by=timestamp&filter_distance=160&filter_include_remote=1&filter_include_relocation=0"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:48:00.017Z",
+      "id": "0385171a-924b-46ac-a5ae-20c591ba48c3",
+      "order": 5,
+      "title": "Wells Fargo",
+      "updatedAt": "2026-08-30T07:48:00.017Z",
+      "url": "https://wd1.myworkdaysite.com/en-US/recruiting/wf/WellsFargoJobs?locations=bddaef21b52c01016acd172f97db0000&locationCountry=c4f78be1a8f14da0ab49ce1162348a5e&timeType=50c5418d15190102da8c58e585d90001&jobFamilyGroup=b5c3287c76c20100b318a19542940001&jobFamilyGroup=b5c3287c76c20100b318a04db6d00001"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:48:12.768Z",
+      "id": "fe187f7c-4b1f-437f-b183-9d6aa106a8f0",
+      "order": 6,
+      "title": "Hotstar",
+      "updatedAt": "2026-08-30T07:48:12.768Z",
+      "url": "https://jiostar.wd102.myworkdayjobs.com/JioStar?q=Software+Engineer&locations=ab9eb26f865610012f58330146080000&locations=0b1b9a16537b1001c816f9723f750000&locations=ab9eb26f865610012f57daf2436d0000&locations=ab9eb26f865610012f571d773f2f0000&locations=ab9eb26f865610012f582a874d830000&jobFamilyGroup=8df5dc1586541000539b236955f10000"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:49:36.518Z",
+      "id": "5cbd36d6-125d-436f-8fc1-e344e33fda6c",
+      "order": 7,
+      "title": "Swiggy",
+      "updatedAt": "2026-08-30T07:49:36.518Z",
+      "url": "https://careers.swiggy.com/#/careers?src=careers&location=Bangalore"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:49:47.717Z",
+      "id": "5a30ff63-156d-4676-bde6-495b09b45a83",
+      "order": 8,
+      "title": "Amazon",
+      "updatedAt": "2026-08-30T07:49:47.717Z",
+      "url": "https://amazon.jobs/en/search?offset=0&result_limit=10&sort=recent&category%5B%5D=software-development&state%5B%5D=Karnataka&city%5B%5D=Bengaluru&distanceType=Mi&radius=56km&industry_experience=four_to_six_years&is_manager%5B%5D=0&latitude=12.96617&longitude=77.58692&loc_group_id=&loc_query=Bangalore%2C%20Karnataka%2C%20India&base_query=&city=Bengaluru&country=IND&region=Karnataka&county=Bengaluru&query_options=&"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:49:59.199Z",
+      "id": "17abaa3c-83b8-4ae2-87cf-87bd09efc352",
+      "order": 9,
+      "title": "Celonis",
+      "updatedAt": "2026-08-30T07:49:59.199Z",
+      "url": "https://careers.celonis.com/join-us/open-positions?groupedLocation=Bangalore%2C+India&seniority=Experienced+Professional&team=Engineering"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:50:51.050Z",
+      "id": "d8710464-5aac-4e42-982b-9749d984acf2",
+      "order": 10,
+      "title": "Salesforce",
+      "updatedAt": "2026-08-30T07:50:51.050Z",
+      "url": "https://salesforce.wd12.myworkdayjobs.com/en-US/External_Career_Site?CF_-_REC_-_LRV_-_Job_Posting_Anchor_-_Country_from_Job_Posting_Location_Extended=c4f78be1a8f14da0ab49ce1162348a5e&locations=8ef61f627eb01012453a9ce004d20000&locations=1038e944b1101012453f5b10dc370000&locations=1038e944b1101012453a0fff44b80000&jobFamilyGroup=14fa3452ec7c1011f90d0002a2100000"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:51:03.100Z",
+      "id": "519db9ca-5283-4763-8acb-77b1a5e01c14",
+      "order": 11,
+      "title": "Walmart",
+      "updatedAt": "2026-08-30T07:51:03.100Z",
+      "url": "https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e&jobFamilyGroup=e83ebdbd2a0a01e7e1477a8948e904c6"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:51:15.434Z",
+      "id": "8abfcbcc-037c-4f38-a06a-0cfd230fbf20",
+      "order": 12,
+      "title": "Intuit",
+      "updatedAt": "2026-08-30T07:51:15.434Z",
+      "url": "https://jobs.intuit.com/search-jobs/Bengaluru%2C%20Karnataka/27595/4/1269750-1267701-1277331-1277333/12x97194/77x59369/0/2"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:51:23.783Z",
+      "id": "d5cc650b-9c86-497b-bd9e-65c52babe39c",
+      "order": 13,
+      "title": "Tesco",
+      "updatedAt": "2026-08-30T07:51:23.783Z",
+      "url": "https://careers.tesco.com/en_GB/careersmarketplace/SearchJobs?_gl=1*rc2vq*_up*MQ..*_ga*NTgxNjg5NDQ4LjE3ODc1OTEwOTU.*_ga_FCL0R2642N*czE3ODc1OTEwOTQkbzEkZzAkdDE3ODc1OTEwOTUkajU5JGwwJGgw"
+    },
+    {
+      "category": "Jobs",
+      "createdAt": "2026-08-30T07:51:53.117Z",
+      "id": "3f1b5dd6-6d61-414f-ab65-791d4588fcc6",
+      "order": 14,
+      "title": "Chargebee",
+      "updatedAt": "2026-08-30T07:51:53.117Z",
+      "url": "https://www.linkedin.com/jobs/search-results/?currentJobId=4458919981&keywords=jobs&origin=JOB_SEARCH_PAGE_JOB_FILTER&referralSearchId=Eo963DWX6nWZKEPwasykzg%3D%3D&geoId=102713980&f_TPR=r604800&f_C=2277385"
+    },
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:56:15.946Z",
+      "id": "0cce7895-eb53-4e5e-a95b-5a2a6400f0d8",
+      "order": 15,
+      "title": "Portfolio",
+      "updatedAt": "2026-08-30T07:56:15.946Z",
+      "url": "https://dharmaraj-rathinavel.work/"
+    },
+    {
+      "category": "Personal",
+      "createdAt": "2026-08-30T07:56:34.529Z",
+      "id": "ef357112-4e21-4dc4-9c33-80b7d677e70b",
+      "order": 16,
+      "title": "Substack",
+      "updatedAt": "2026-08-30T07:56:34.529Z",
+      "url": "https://dharmarajrathinavel.substack.com/archive"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:34:35.099Z",
+      "id": "14c30787-2d41-406f-b91a-d50ccdd05a2b",
+      "order": 17,
+      "title": "Lovable",
+      "updatedAt": "2026-08-30T08:34:35.099Z",
+      "url": "https://lovable.dev/chats/new"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:34:57.630Z",
+      "id": "cfe82e90-b58e-4483-bf2f-641b9d2dd8ef",
+      "order": 18,
+      "title": "Cursor",
+      "updatedAt": "2026-08-30T08:34:57.630Z",
+      "url": "https://cursor.com/agents"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:35:10.364Z",
+      "id": "3cc8870e-d297-42af-b434-ef8ab212ecf1",
+      "order": 19,
+      "title": "Claude",
+      "updatedAt": "2026-08-30T08:35:10.364Z",
+      "url": "https://claude.ai/"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:35:20.647Z",
+      "id": "8adae532-68d6-46d9-8966-5c894b9b61c9",
+      "order": 20,
+      "title": "ChatGPT",
+      "updatedAt": "2026-08-30T08:35:20.647Z",
+      "url": "https://chat.openai.com/"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:35:42.414Z",
+      "id": "22f09ccf-0866-44a3-b694-69ae497d4d9b",
+      "order": 21,
+      "title": "Replit",
+      "updatedAt": "2026-08-30T08:35:42.414Z",
+      "url": "https://replit.com/~"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:35:59.579Z",
+      "id": "b8819931-1d9e-4978-970f-f85e4d38c7b2",
+      "order": 22,
+      "title": "Perplexity",
+      "updatedAt": "2026-08-30T08:35:59.579Z",
+      "url": "https://www.perplexity.ai/"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T08:36:58.296Z",
+      "id": "b901f0c0-0340-485d-8cc0-8d02b50dc564",
+      "order": 23,
+      "title": "Gemini",
+      "updatedAt": "2026-08-30T08:36:58.296Z",
+      "url": "https://gemini.google.com/"
+    },
+    {
+      "category": "Tools",
+      "createdAt": "2026-08-30T10:48:09.555Z",
+      "id": "da5e9678-cd6d-4508-90c0-d861b43e3487",
+      "order": 24,
+      "title": "Excalidraw",
+      "updatedAt": "2026-08-30T10:48:09.555Z",
+      "url": "https://excalidraw.com/"
+    },
+    {
+      "category": "Tools",
+      "createdAt": "2026-08-30T10:49:50.403Z",
+      "id": "a9e68b76-38a4-416c-9ac4-ddcf9d616c3b",
+      "order": 25,
+      "title": "Mermaid",
+      "updatedAt": "2026-08-30T10:49:50.403Z",
+      "url": "https://mermaid.live/"
+    },
+    {
+      "category": "Tools",
+      "createdAt": "2026-08-30T10:52:13.321Z",
+      "id": "8d61209b-2576-43ae-a874-19254dad1ddd",
+      "order": 26,
+      "title": "Netlify",
+      "updatedAt": "2026-08-30T10:52:13.321Z",
+      "url": "https://app.netlify.com/teams/dharmarajrdr/projects"
+    },
+    {
+      "category": "Tools",
+      "createdAt": "2026-08-30T10:53:07.905Z",
+      "id": "05c17579-3725-44d7-bdfe-2850f729f7eb",
+      "order": 27,
+      "title": "Namecheap",
+      "updatedAt": "2026-08-30T10:53:07.905Z",
+      "url": "https://www.namecheap.com/"
+    },
+    {
+      "category": "Tools",
+      "createdAt": "2026-08-30T11:07:55.749Z",
+      "id": "50cb13d1-fcd9-4e4d-917d-d3b6cb097d2b",
+      "order": 28,
+      "title": "ContactOut",
+      "updatedAt": "2026-08-30T11:07:55.749Z",
+      "url": "https://contactout.com/dashboard/search"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T11:10:38.983Z",
+      "id": "26f2fef7-f275-4632-863e-9f7e38d2efc2",
+      "order": 29,
+      "title": "Raccoon",
+      "updatedAt": "2026-08-30T11:10:38.983Z",
+      "url": "https://raccoonai.tech/"
+    },
+    {
+      "category": "AI Tools",
+      "createdAt": "2026-08-30T11:11:21.065Z",
+      "id": "acb45c76-2588-4167-87b1-f50f4f8218ac",
+      "order": 30,
+      "title": "Copilot",
+      "updatedAt": "2026-08-30T11:11:21.065Z",
+      "url": "https://copilot.microsoft.com/"
+    }
+  ],
+  "notes": [],
+  "snippets": [],
+  "learnTopics": [],
+  "watchLater": [],
+  "techBlogs": [
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:12:35.823Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788091955823-tpmbe",
+      "name": "Airbnb",
+      "url": "https://medium.com/airbnb-engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:59:29.283Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=atlassianblog.wpengine.com",
+      "id": "blog-1788091169282-1akyt",
+      "name": "Atlassian",
+      "url": "https://atlassianblog.wpengine.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:44:07.321Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=aws.amazon.com",
+      "id": "blog-1788090247321-8a4bk",
+      "name": "AWS Architecture",
+      "url": "https://aws.amazon.com/blogs/architecture/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:34:40.135Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=builder.aws.com",
+      "id": "blog-1788089680135-2b24j",
+      "name": "AWS Builder",
+      "url": "https://builder.aws.com/learn/topics/builders-library"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:13:58.475Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=tech.bigbasket.com",
+      "id": "blog-1788092038475-8r5qq",
+      "name": "Bigbasket",
+      "url": "https://tech.bigbasket.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:33:55.951Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=lambda.blinkit.com",
+      "id": "blog-1788089635951-hvw0l",
+      "name": "BlinkIt",
+      "url": "https://lambda.blinkit.com/all?topic=engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:59:43.566Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.booking.com",
+      "id": "blog-1788091183566-bvlws",
+      "name": "Booking.com",
+      "url": "https://blog.booking.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:52:32.856Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=careers.celonis.com",
+      "id": "blog-1788090752856-ior26",
+      "name": "Celonis",
+      "url": "https://careers.celonis.com/blog?topic=Engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:43:02.004Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.cloudflare.com",
+      "id": "blog-1788090182004-h0ue4",
+      "name": "Cloudflare",
+      "url": "https://blog.cloudflare.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:12:53.488Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.coursera.org",
+      "id": "blog-1788091973488-bw044",
+      "name": "Coursera",
+      "url": "https://blog.coursera.org/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:41:44.205Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=discord.com",
+      "id": "blog-1788090104205-yr283",
+      "name": "Discord",
+      "url": "https://discord.com/category/engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:59:59.782Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=dropbox.tech",
+      "id": "blog-1788091199782-g2jmk",
+      "name": "Dropbox",
+      "url": "https://dropbox.tech/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:00:45.632Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=engineering.fb.com",
+      "id": "blog-1788091245632-ipl7b",
+      "name": "Facebook AI",
+      "url": "https://engineering.fb.com/category/ai-research/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:33:39.668Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.flipkart.tech",
+      "id": "blog-1788089619668-deyxo",
+      "name": "Flipkart",
+      "url": "https://blog.flipkart.tech/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:51:25.955Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=github.blog",
+      "id": "blog-1788090685955-qsq0d",
+      "name": "GitHub",
+      "url": "https://github.blog/engineering/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:42:33.986Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.google",
+      "id": "blog-1788090153986-0yktu",
+      "name": "Google Dev",
+      "url": "https://blog.google/technology/developers/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:01:34.066Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=engineering.hackerearth.com",
+      "id": "blog-1788091294066-3tbmm",
+      "name": "HackerEarth",
+      "url": "https://engineering.hackerearth.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:26:35.067Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.hotstar.com",
+      "id": "blog-1788089195067-ml6z3",
+      "name": "Hotstar",
+      "url": "https://blog.hotstar.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:02:26.647Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=product.hubspot.com",
+      "id": "blog-1788091346647-kzz9s",
+      "name": "HubSpot",
+      "url": "https://product.hubspot.com/blog/topic/engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:02:15.000Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=engineering.instagram.com",
+      "id": "blog-1788091335000-8mtm5",
+      "name": "Instagram",
+      "url": "https://engineering.instagram.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:02:56.099Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=www.linkedin.com",
+      "id": "blog-1788091376099-djngf",
+      "name": "LinkedIn",
+      "url": "https://www.linkedin.com/blog/engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:03:28.450Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.engineering",
+      "id": "blog-1788091408450-i5n2k",
+      "name": "Medium",
+      "url": "https://medium.engineering/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:41:57.504Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=engineering.fb.com",
+      "id": "blog-1788090117504-k63m5",
+      "name": "Meta",
+      "url": "https://engineering.fb.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:11:37.441Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=azure.microsoft.com",
+      "id": "blog-1788091897441-hf96h",
+      "name": "Microsoft Azure",
+      "url": "https://azure.microsoft.com/en-us/blog/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:33:26.551Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788089606551-3wxqr",
+      "name": "Myntra",
+      "url": "https://medium.com/myntra-engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:16:48.189Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=nammayatri.in",
+      "id": "blog-1788092208189-4jx94",
+      "name": "Nammayatri",
+      "url": "https://nammayatri.in/techBlog/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:42:14.305Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=netflixtechblog.com",
+      "id": "blog-1788090134305-j3c9l",
+      "name": "Netflix",
+      "url": "https://netflixtechblog.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:34:50.400Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788089690400-ihoha",
+      "name": "PayPal",
+      "url": "https://medium.com/paypal-tech/all?topic=engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:17:13.310Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=tech.phonepe.com",
+      "id": "blog-1788092233310-g6pmt",
+      "name": "Phonepe",
+      "url": "https://tech.phonepe.com/category/architecture/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:34:18.799Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788089658799-jx3oe",
+      "name": "Pinterest",
+      "url": "https://medium.com/pinterest-engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:14:57.557Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788092097557-7mu91",
+      "name": "Rapido",
+      "url": "https://medium.com/rapido-labs/all?topic=engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:35:02.368Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788089702368-q2op0",
+      "name": "RedBus",
+      "url": "https://medium.com/redbus-in/subpage/d40852c3a26"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:13:08.607Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=redditinc.com",
+      "id": "blog-1788091988607-2xeg2",
+      "name": "Reddit",
+      "url": "https://redditinc.com/news"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:04:49.083Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=slack.engineering",
+      "id": "blog-1788091489083-27g9o",
+      "name": "Slack",
+      "url": "https://slack.engineering/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:41:26.004Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=engineering.atspotify.com",
+      "id": "blog-1788090086004-g92kt",
+      "name": "Spotify",
+      "url": "https://engineering.atspotify.com/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:42:46.938Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=stripe.com",
+      "id": "blog-1788090166938-5gs6g",
+      "name": "Stripe",
+      "url": "https://stripe.com/blog/engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:33:03.018Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788089583018-az8vh",
+      "name": "Swiggy",
+      "url": "https://medium.com/swiggy-bytes/all?topic=swiggy-engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:06:01.367Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=www.twilio.com",
+      "id": "blog-1788091561367-93pg2",
+      "name": "Twilio",
+      "url": "https://www.twilio.com/en-us/blog"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:12:08.656Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.x.com",
+      "id": "blog-1788091928656-o4exd",
+      "name": "Twitter",
+      "url": "https://blog.x.com/engineering/en_us"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:43:13.721Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=www.uber.com",
+      "id": "blog-1788090193721-e7n2q",
+      "name": "Uber",
+      "url": "https://www.uber.com/en-IN/blog/engineering/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:17:47.622Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=medium.com",
+      "id": "blog-1788092267622-hlkna",
+      "name": "Urban Company",
+      "url": "https://medium.com/uc-engineering"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:10:05.534Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=blog.whatsapp.com",
+      "id": "blog-1788091805534-2nst6",
+      "name": "WhatsApp",
+      "url": "https://blog.whatsapp.com"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T12:17:29.248Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=zerodha.tech",
+      "id": "blog-1788092249248-r2576",
+      "name": "Zerodha",
+      "url": "https://zerodha.tech/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:54:40.297Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=www.zoho.com",
+      "id": "blog-1788090880297-5gr0h",
+      "name": "Zoho",
+      "url": "https://www.zoho.com/blog/"
+    },
+    {
+      "category": "Engineering",
+      "createdAt": "2026-08-30T11:53:13.589Z",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=www.zomato.com",
+      "id": "blog-1788090793589-uxvhg",
+      "name": "Zomato",
+      "url": "https://www.zomato.com/blog/category/technology/"
+    }
+  ],
+  "settings": {
+    "accentColor": "#06B6D4",
+    "clock": {
+      "showDate": true,
+      "showSeconds": true,
+      "use24Hour": false
+    },
+    "notifications": {
+      "enabled": true,
+      "notifyAtDueTime": true,
+      "notifyMinutesBefore": 15
+    },
+    "background": {
+      "blurPx": 1,
+      "enabled": true,
+      "imageUrl": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "opacity": 0.3,
+      "overlayIntensity": 0.4
+    },
+    "integrations": {
+      "githubToken": "",
+      "githubUsername": "dharmarajrdr",
+      "leetcodeUsername": "dharmaraj_rathinavel"
+    }
+  },
+  "pomodoroSettings": {
+    "breakMinutes": 5,
+    "focusMinutes": 25
+  },
+  "focusSessionLog": [
+    {
+      "completedAt": "2026-08-30T10:59:48.289Z",
+      "id": "a97466c8-1f53-4bf9-a6c6-1ace63440ece",
+      "minutes": 25
+    },
+    {
+      "completedAt": "2026-08-30T09:40:22.499Z",
+      "id": "464cdc29-6ea0-4068-8b47-0b3e8ee6fa85",
+      "minutes": 25
+    }
+  ],
+  "widgetLayout": [
+    {
+      "h": 2,
+      "id": "clock",
+      "minimized": false,
+      "type": "CLOCK",
+      "visible": true,
+      "w": 7,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "h": 6,
+      "id": "todo",
+      "minimized": false,
+      "type": "TODO",
+      "visible": true,
+      "w": 7,
+      "x": 0,
+      "y": 2
+    },
+    {
+      "h": 8,
+      "id": "shortcuts",
+      "minimized": false,
+      "type": "SHORTCUTS",
+      "visible": true,
+      "w": 5,
+      "x": 7,
+      "y": 0
+    },
+    {
+      "h": 4,
+      "id": "stopwatch",
+      "minimized": false,
+      "type": "STOPWATCH",
+      "visible": true,
+      "w": 4,
+      "x": 0,
+      "y": 19
+    },
+    {
+      "h": 4,
+      "id": "timer",
+      "minimized": false,
+      "type": "TIMER",
+      "visible": true,
+      "w": 4,
+      "x": 8,
+      "y": 19
+    },
+    {
+      "h": 4,
+      "id": "pomodoro",
+      "minimized": false,
+      "type": "POMODORO",
+      "visible": true,
+      "w": 4,
+      "x": 4,
+      "y": 19
+    },
+    {
+      "h": 5,
+      "id": "devtools",
+      "minimized": false,
+      "type": "DEV_TOOLS",
+      "visible": true,
+      "w": 4,
+      "x": 8,
+      "y": 29
+    },
+    {
+      "h": 8,
+      "id": "snippets",
+      "minimized": false,
+      "type": "SNIPPETS",
+      "visible": true,
+      "w": 4,
+      "x": 0,
+      "y": 29
+    },
+    {
+      "h": 8,
+      "id": "notes",
+      "minimized": false,
+      "type": "NOTES",
+      "visible": true,
+      "w": 4,
+      "x": 4,
+      "y": 29
+    },
+    {
+      "h": 3,
+      "id": "productivity",
+      "minimized": false,
+      "type": "PRODUCTIVITY",
+      "visible": true,
+      "w": 4,
+      "x": 8,
+      "y": 34
+    },
+    {
+      "h": 5,
+      "id": "github",
+      "minimized": false,
+      "type": "GITHUB",
+      "visible": true,
+      "w": 6,
+      "x": 0,
+      "y": 8
+    },
+    {
+      "h": 5,
+      "id": "leetcode",
+      "minimized": false,
+      "type": "LEETCODE",
+      "visible": true,
+      "w": 6,
+      "x": 6,
+      "y": 8
+    },
+    {
+      "h": 6,
+      "id": "tolearn",
+      "minimized": false,
+      "type": "TO_LEARN",
+      "visible": true,
+      "w": 7,
+      "x": 0,
+      "y": 23
+    },
+    {
+      "h": 6,
+      "id": "watchlater",
+      "minimized": false,
+      "type": "WATCH_LATER",
+      "visible": true,
+      "w": 5,
+      "x": 7,
+      "y": 23
+    },
+    {
+      "h": 6,
+      "id": "techblogs",
+      "minimized": false,
+      "type": "TECH_BLOGS",
+      "visible": true,
+      "w": 12,
+      "x": 0,
+      "y": 13
+    }
+  ]
+}
