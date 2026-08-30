@@ -248,6 +248,37 @@ export interface GitHubActivitySummary {
   issues: number
 }
 
+// ── To Learn & Skills Tracker ─────────────────────────────────────────
+
+export type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
+export type LearnStatus = 'TO_LEARN' | 'IN_PROGRESS' | 'COMPLETED'
+
+export interface LearnTopic {
+  id: string
+  title: string
+  category?: string
+  level: SkillLevel
+  status: LearnStatus
+  notes?: string
+  resourceLink?: string
+  icon?: string
+  createdAt: string
+  completedAt?: string
+}
+
+// ── Watch Later (Videos & Playlists) ──────────────────────────────────
+
+export interface WatchLaterItem {
+  id: string
+  url: string
+  title: string
+  thumbnailUrl: string
+  type: 'video' | 'playlist'
+  completed: boolean
+  createdAt: string
+  completedAt?: string
+}
+
 // ── Sync (Phase 7 — Google account sync) ───────────────────────────────
 
 export interface GoogleProfile {
@@ -264,6 +295,8 @@ export interface SyncPayload {
   shortcuts: Shortcut[]
   notes: Note[]
   snippets: Snippet[]
+  learnTopics?: LearnTopic[]
+  watchLater?: WatchLaterItem[]
   settings: Settings
   widgetLayout: WidgetConfig[]
   pomodoroSettings: PomodoroSettings
@@ -283,6 +316,8 @@ export type WidgetType =
   | 'PRODUCTIVITY'
   | 'GITHUB'
   | 'LEETCODE'
+  | 'TO_LEARN'
+  | 'WATCH_LATER'
 // Further types (CALENDAR, QUOTE, SYSTEM_STATUS) register the same way —
 // see widgets/registry.ts — once their components exist.
 

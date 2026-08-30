@@ -13,6 +13,9 @@ import { NotesWidget } from './notes/NotesWidget'
 import { ProductivityWidget } from './productivity/ProductivityWidget'
 import { GitHubWidget } from './github/GitHubWidget'
 import { LeetCodeWidget } from './leetcode/LeetCodeWidget'
+import { ToLearnWidget } from './tolearn/ToLearnWidget'
+import { WatchLaterWidget } from './watchlater/WatchLaterWidget'
+import { GraduationCap, Tv } from 'lucide-react'
 
 export interface WidgetDefinition {
   type: WidgetType
@@ -40,4 +43,6 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   PRODUCTIVITY: { type: 'PRODUCTIVITY', title: 'Productivity', icon: BarChart3, component: ProductivityWidget },
   GITHUB: { type: 'GITHUB', title: 'GitHub Activity', icon: Github, component: GitHubWidget },
   LEETCODE: { type: 'LEETCODE', title: 'LeetCode Activity', icon: Code2, component: LeetCodeWidget },
+  TO_LEARN: { type: 'TO_LEARN', title: 'To Learn', icon: GraduationCap, component: ToLearnWidget },
+  WATCH_LATER: { type: 'WATCH_LATER', title: 'Watch Later', icon: Tv, component: WatchLaterWidget },
 }

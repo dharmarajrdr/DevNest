@@ -1,11 +1,13 @@
 import type {
   FocusSessionLogEntry,
+  LearnTopic,
   Note,
   PomodoroSettings,
   Settings,
   Shortcut,
   Snippet,
   Todo,
+  WatchLaterItem,
   WidgetConfig,
 } from '@/types'
 import { DEFAULT_SETTINGS, DEFAULT_POMODORO_SETTINGS } from '@/types'
@@ -17,6 +19,8 @@ import { SettingsRepository } from './repositories/SettingsRepository'
 import { DEFAULT_LAYOUT, WidgetRepository } from './repositories/WidgetRepository'
 import { PomodoroRepository } from './repositories/PomodoroRepository'
 import { ProductivityRepository } from './repositories/ProductivityRepository'
+import { ToLearnRepository, DEFAULT_LEARN_TOPICS } from './repositories/ToLearnRepository'
+import { WatchLaterRepository, DEFAULT_WATCH_LATER } from './repositories/WatchLaterRepository'
 import { StorageService } from './StorageService'
 import { TaskAlarmService } from '@/services/alarms/TaskAlarmService'
 import { useTodoStore } from '@/store/useTodoStore'
@@ -26,6 +30,8 @@ import { useSnippetStore } from '@/store/useSnippetStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { useWidgetStore } from '@/store/useWidgetStore'
 import { usePomodoroStore } from '@/store/usePomodoroStore'
+import { useToLearnStore } from '@/store/useToLearnStore'
+import { useWatchLaterStore } from '@/store/useWatchLaterStore'
 
 export interface ExportOptions {
   exportData?: boolean
@@ -40,6 +46,8 @@ export interface BackupPayload {
   shortcuts?: Shortcut[]
   notes?: Note[]
   snippets?: Snippet[]
+  learnTopics?: LearnTopic[]
+  watchLater?: WatchLaterItem[]
   settings?: Settings
   widgetLayout?: WidgetConfig[]
   pomodoroSettings?: PomodoroSettings
@@ -51,6 +59,8 @@ export interface BackupSummary {
   shortcutsCount: number
   notesCount: number
   snippetsCount: number
+  learnTopicsCount?: number
+  watchLaterCount?: number
   focusSessionsCount: number
 }
 
@@ -63,16 +73,20 @@ async function reloadAllStores(): Promise<void> {
     useSettingsStore.getState().load(),
     useWidgetStore.getState().load(),
     usePomodoroStore.getState().load(),
+    useToLearnStore.getState().load(),
+    useWatchLaterStore.getState().load(),
   ])
 }
 
 export const BackupService = {
   async getStorageSummary(): Promise<BackupSummary> {
-    const [todos, shortcuts, notes, snippets, focusLog] = await Promise.all([
+    const [todos, shortcuts, notes, snippets, learnTopics, watchLater, focusLog] = await Promise.all([
       TodoRepository.getAll(),
       ShortcutRepository.getAll(),
       NoteRepository.getAll(),
       SnippetRepository.getAll(),
+      ToLearnRepository.getAll(),
+      WatchLaterRepository.getAll(),
       ProductivityRepository.getAll(),
     ])
 
@@ -81,6 +95,8 @@ export const BackupService = {
       shortcutsCount: shortcuts.length,
       notesCount: notes.length,
       snippetsCount: snippets.length,
+      learnTopicsCount: learnTopics.length,
+      watchLaterCount: watchLater.length,
       focusSessionsCount: focusLog.length,
     }
   },
@@ -100,12 +116,14 @@ export const BackupService = {
     }
 
     if (includeData) {
-      const [todos, shortcuts, notes, snippets, settings, pomodoroSettings, focusLog] =
+      const [todos, shortcuts, notes, snippets, learnTopics, watchLater, settings, pomodoroSettings, focusLog] =
         await Promise.all([
           TodoRepository.getAll(),
           ShortcutRepository.getAll(),
           NoteRepository.getAll(),
           SnippetRepository.getAll(),
+          ToLearnRepository.getAll(),
+          WatchLaterRepository.getAll(),
           SettingsRepository.get(),
           PomodoroRepository.getSettings(),
           ProductivityRepository.getAll(),
@@ -115,6 +133,8 @@ export const BackupService = {
       payload.shortcuts = shortcuts
       payload.notes = notes
       payload.snippets = snippets
+      payload.learnTopics = learnTopics
+      payload.watchLater = watchLater
       payload.settings = settings
       payload.pomodoroSettings = pomodoroSettings
       payload.focusSessionLog = focusLog
@@ -177,6 +197,8 @@ export const BackupService = {
         'shortcuts' in obj ||
         'notes' in obj ||
         'snippets' in obj ||
+        'learnTopics' in obj ||
+        'watchLater' in obj ||
         'settings' in obj ||
         'widgetLayout' in obj
 
@@ -200,6 +222,12 @@ export const BackupService = {
       }
       if (Array.isArray(obj.snippets)) {
         tasks.push(SnippetRepository.replaceAll(obj.snippets))
+      }
+      if (Array.isArray(obj.learnTopics)) {
+        tasks.push(ToLearnRepository.replaceAll(obj.learnTopics))
+      }
+      if (Array.isArray(obj.watchLater)) {
+        tasks.push(WatchLaterRepository.replaceAll(obj.watchLater))
       }
       if (obj.settings && typeof obj.settings === 'object') {
         tasks.push(SettingsRepository.update(obj.settings))
@@ -233,6 +261,8 @@ export const BackupService = {
         shortcutsCount: Array.isArray(obj.shortcuts) ? obj.shortcuts.length : 0,
         notesCount: Array.isArray(obj.notes) ? obj.notes.length : 0,
         snippetsCount: Array.isArray(obj.snippets) ? obj.snippets.length : 0,
+        learnTopicsCount: Array.isArray(obj.learnTopics) ? obj.learnTopics.length : 0,
+        watchLaterCount: Array.isArray(obj.watchLater) ? obj.watchLater.length : 0,
         focusSessionsCount: Array.isArray(obj.focusSessionLog) ? obj.focusSessionLog.length : 0,
       }
 
@@ -256,6 +286,8 @@ export const BackupService = {
       SettingsRepository.update(DEFAULT_SETTINGS),
       WidgetRepository.saveLayout(DEFAULT_LAYOUT),
       PomodoroRepository.saveSettings(DEFAULT_POMODORO_SETTINGS),
+      ToLearnRepository.replaceAll(DEFAULT_LEARN_TOPICS),
+      WatchLaterRepository.replaceAll(DEFAULT_WATCH_LATER),
     ])
 
     if (typeof document !== 'undefined' && document.documentElement) {

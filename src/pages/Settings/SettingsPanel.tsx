@@ -81,7 +81,7 @@ const TABS: TabConfig[] = [
   },
   {
     key: 'dashboard',
-    label: 'Widgets & Grid',
+    label: 'Customization & Widgets',
     icon: LayoutGrid,
     badgeColor: 'text-emerald-400',
     badgeBg: 'bg-emerald-500/10',
@@ -181,19 +181,19 @@ function SettingRow({
 
 export function SettingsPanel({ open, onClose }: Props) {
   const { settings, update } = useSettingsStore()
-  const { layout, toggleVisible, resetLayout } = useWidgetStore()
+  const { layout, toggleVisible, resetLayout, customizing, toggleCustomizing } = useWidgetStore()
   const [activeTab, setActiveTab] = useState<TabKey>('appearance')
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title="Settings"
-      maxWidth="max-w-3xl"
-      bodyClassName="p-0 flex flex-col md:flex-row min-h-[480px] max-h-[75vh]"
+      title="Settings & Customization"
+      maxWidth="max-w-4xl w-[860px]"
+      bodyClassName="p-0 flex flex-col md:flex-row h-[580px] min-h-[580px] max-h-[580px] overflow-hidden"
     >
       {/* Sidebar Navigation */}
-      <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-border bg-surface/60 p-2 md:p-3 overflow-x-auto md:overflow-y-auto">
+      <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-border bg-surface/60 p-2 md:p-3 overflow-x-auto md:overflow-y-auto h-full">
         <div className="flex md:flex-col gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon
@@ -529,48 +529,85 @@ export function SettingsPanel({ open, onClose }: Props) {
           </div>
         )}
 
-        {/* Dashboard & Widgets Tab */}
+        {/* Customization & Widgets Tab */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-text-primary">Widget Management</h3>
-                <p className="text-xs text-text-secondary mt-0.5">
-                  Toggle widget visibility on the dashboard grid.
-                </p>
-              </div>
-              <Button size="sm" variant="secondary" onClick={() => resetLayout()}>
-                <RotateCcw size={12} />
-                Reset Layout
-              </Button>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold text-text-primary">Dashboard & Customization</h3>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Customize your layout arrangement, toggle active widgets, and enter grid edit mode.
+              </p>
             </div>
 
-            <div className="rounded-lg border border-border bg-surface-elevated/40 p-4 space-y-1 divide-y divide-border/40">
-              {layout.map((w) => {
-                const def = WIDGET_REGISTRY[w.type]
-                const Icon = def?.icon ?? Layers
-                const title = def?.title ?? w.type
-                return (
-                  <div key={w.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-surface border border-border text-text-secondary">
-                        <Icon size={14} />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-text-primary">{title}</p>
-                        <p className="text-[10px] text-text-secondary">
-                          {w.visible ? 'Visible on grid' : 'Hidden in tray'}
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={w.visible}
-                      onChange={() => toggleVisible(w.id)}
-                      label={`Toggle ${title} visibility`}
-                    />
+            {/* Interactive Grid Customization */}
+            <div className="rounded-lg border border-border bg-surface-elevated/40 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <LayoutGrid size={16} />
                   </div>
-                )
-              })}
+                  <div>
+                    <h4 className="text-xs font-bold text-text-primary">Interactive Grid Customization</h4>
+                    <p className="text-[11px] text-text-secondary">
+                      Drag, drop, and resize widget tiles directly on your workspace.
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    toggleCustomizing()
+                    onClose()
+                  }}
+                  className={cn(
+                    'text-xs font-semibold',
+                    customizing ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : '',
+                  )}
+                >
+                  <LayoutGrid size={13} />
+                  {customizing ? 'Exit Customization' : 'Customize Grid'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Widget Visibility List */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-text-primary">Visible Dashboard Widgets</h4>
+                <Button size="sm" variant="secondary" onClick={() => resetLayout()}>
+                  <RotateCcw size={12} />
+                  Reset Layout
+                </Button>
+              </div>
+
+              <div className="rounded-lg border border-border bg-surface-elevated/40 p-4 space-y-1 divide-y divide-border/40 max-h-72 overflow-y-auto">
+                {layout.map((w) => {
+                  const def = WIDGET_REGISTRY[w.type]
+                  const Icon = def?.icon ?? Layers
+                  const title = def?.title ?? w.type
+                  return (
+                    <div key={w.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-surface border border-border text-text-secondary">
+                          <Icon size={14} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-text-primary">{title}</p>
+                          <p className="text-[10px] text-text-secondary">
+                            {w.visible ? 'Visible on grid' : 'Hidden in tray'}
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={w.visible}
+                        onChange={() => toggleVisible(w.id)}
+                        label={`Toggle ${title} visibility`}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}
