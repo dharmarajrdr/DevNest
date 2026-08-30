@@ -1,12 +1,12 @@
 import { lazy } from 'react'
 import {
   Braces, Binary, Link2, Fingerprint, Clock3, Hash, Regex, KeyRound, Palette,
-  CaseSensitive, FileText, Dices, Timer as CronIcon, ListChecks, GitBranch, Container, Terminal, Database,
+  CaseSensitive, FileText, Dices, Timer as CronIcon, ListChecks, GitBranch, Container, Terminal, Database, GitCompare,
 } from 'lucide-react'
 
 /**
  * Each tool is lazy-loaded — the dashboard's initial bundle shouldn't pay
- * for 18 utility panels most sessions never open. React.lazy + Suspense in
+ * for 19 utility panels most sessions never open. React.lazy + Suspense in
  * ToolModal handles the loading state.
  */
 export interface DevToolDefinition {
@@ -17,6 +17,7 @@ export interface DevToolDefinition {
 }
 
 export const DEV_TOOLS: DevToolDefinition[] = [
+  { id: 'diff', label: 'Diff Viewer', icon: GitCompare, component: lazy(() => import('./DiffTool').then((m) => ({ default: m.DiffTool }))) },
   { id: 'json', label: 'JSON Format/Minify', icon: Braces, component: lazy(() => import('./JsonTool').then((m) => ({ default: m.JsonTool }))) },
   { id: 'base64', label: 'Base64', icon: Binary, component: lazy(() => import('./Base64Tool').then((m) => ({ default: m.Base64Tool }))) },
   { id: 'url', label: 'URL Encode/Decode', icon: Link2, component: lazy(() => import('./UrlEncodeTool').then((m) => ({ default: m.UrlEncodeTool }))) },

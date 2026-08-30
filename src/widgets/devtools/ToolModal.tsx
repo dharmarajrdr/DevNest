@@ -7,7 +7,12 @@ export function ToolModal({ tool, onClose }: { tool: DevToolDefinition | null; o
   const Tool = tool.component
 
   return (
-    <Modal open={!!tool} onClose={onClose} title={tool.label}>
+    <Modal
+      open={!!tool}
+      onClose={onClose}
+      title={tool.label}
+      maxWidth={tool.id === 'diff' ? 'max-w-5xl' : 'max-w-md'}
+    >
       <Suspense
         fallback={
           <div className="space-y-2">

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
+import { Check, ExternalLink, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
 import type { Todo } from '@/types'
 import { PriorityBadge } from '@/components/ui/Badge'
 import { IconButton } from '@/components/ui/IconButton'
@@ -56,14 +56,30 @@ export function TodoItem({ todo, onEdit }: { todo: Todo; onEdit?: (todo: Todo) =
         </button>
 
         <div className="min-w-0 flex-1">
-          <p
-            className={cn(
-              'truncate text-sm',
-              done ? 'text-text-secondary line-through' : 'text-text-primary',
-            )}
-          >
-            {todo.title}
-          </p>
+          {todo.link ? (
+            <a
+              href={todo.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`Open resource link: ${todo.link}`}
+              className={cn(
+                'inline-flex items-center gap-1.5 text-sm font-medium hover:text-accent hover:underline transition-colors truncate max-w-full',
+                done ? 'text-text-secondary line-through' : 'text-text-primary',
+              )}
+            >
+              <span className="truncate">{todo.title}</span>
+              <ExternalLink size={12} className="shrink-0 text-accent/80" />
+            </a>
+          ) : (
+            <p
+              className={cn(
+                'truncate text-sm',
+                done ? 'text-text-secondary line-through' : 'text-text-primary',
+              )}
+            >
+              {todo.title}
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-x-2 text-[11px]">
             {timeframeLabel && (
               <p className={cn(overdue ? 'text-danger' : 'text-text-secondary')}>

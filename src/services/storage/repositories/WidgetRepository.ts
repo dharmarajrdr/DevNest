@@ -15,9 +15,10 @@ export const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'notes', type: 'NOTES', x: 8, y: 12, w: 4, h: 5, visible: true, minimized: false },
   { id: 'tolearn', type: 'TO_LEARN', x: 0, y: 17, w: 6, h: 6, visible: true, minimized: false },
   { id: 'watchlater', type: 'WATCH_LATER', x: 6, y: 17, w: 6, h: 6, visible: true, minimized: false },
-  { id: 'productivity', type: 'PRODUCTIVITY', x: 0, y: 23, w: 12, h: 5, visible: true, minimized: false },
-  { id: 'github', type: 'GITHUB', x: 0, y: 28, w: 6, h: 6, visible: true, minimized: false },
-  { id: 'leetcode', type: 'LEETCODE', x: 6, y: 28, w: 6, h: 6, visible: true, minimized: false },
+  { id: 'techblogs', type: 'TECH_BLOGS', x: 0, y: 23, w: 12, h: 6, visible: true, minimized: false },
+  { id: 'productivity', type: 'PRODUCTIVITY', x: 0, y: 29, w: 12, h: 5, visible: true, minimized: false },
+  { id: 'github', type: 'GITHUB', x: 0, y: 34, w: 6, h: 6, visible: true, minimized: false },
+  { id: 'leetcode', type: 'LEETCODE', x: 6, y: 34, w: 6, h: 6, visible: true, minimized: false },
 ]
 
 export const WidgetRepository = {

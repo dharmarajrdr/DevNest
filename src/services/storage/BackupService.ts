@@ -6,6 +6,7 @@ import type {
   Settings,
   Shortcut,
   Snippet,
+  TechBlog,
   Todo,
   WatchLaterItem,
   WidgetConfig,
@@ -21,6 +22,7 @@ import { PomodoroRepository } from './repositories/PomodoroRepository'
 import { ProductivityRepository } from './repositories/ProductivityRepository'
 import { ToLearnRepository, DEFAULT_LEARN_TOPICS } from './repositories/ToLearnRepository'
 import { WatchLaterRepository, DEFAULT_WATCH_LATER } from './repositories/WatchLaterRepository'
+import { TechBlogRepository, DEFAULT_TECH_BLOGS } from './repositories/TechBlogRepository'
 import { StorageService } from './StorageService'
 import { TaskAlarmService } from '@/services/alarms/TaskAlarmService'
 import { useTodoStore } from '@/store/useTodoStore'
@@ -32,6 +34,7 @@ import { useWidgetStore } from '@/store/useWidgetStore'
 import { usePomodoroStore } from '@/store/usePomodoroStore'
 import { useToLearnStore } from '@/store/useToLearnStore'
 import { useWatchLaterStore } from '@/store/useWatchLaterStore'
+import { useTechBlogStore } from '@/store/useTechBlogStore'
 
 export interface ExportOptions {
   exportData?: boolean
@@ -48,6 +51,7 @@ export interface BackupPayload {
   snippets?: Snippet[]
   learnTopics?: LearnTopic[]
   watchLater?: WatchLaterItem[]
+  techBlogs?: TechBlog[]
   settings?: Settings
   widgetLayout?: WidgetConfig[]
   pomodoroSettings?: PomodoroSettings
@@ -61,6 +65,7 @@ export interface BackupSummary {
   snippetsCount: number
   learnTopicsCount?: number
   watchLaterCount?: number
+  techBlogsCount?: number
   focusSessionsCount: number
 }
 
@@ -75,18 +80,20 @@ async function reloadAllStores(): Promise<void> {
     usePomodoroStore.getState().load(),
     useToLearnStore.getState().load(),
     useWatchLaterStore.getState().load(),
+    useTechBlogStore.getState().load(),
   ])
 }
 
 export const BackupService = {
   async getStorageSummary(): Promise<BackupSummary> {
-    const [todos, shortcuts, notes, snippets, learnTopics, watchLater, focusLog] = await Promise.all([
+    const [todos, shortcuts, notes, snippets, learnTopics, watchLater, techBlogs, focusLog] = await Promise.all([
       TodoRepository.getAll(),
       ShortcutRepository.getAll(),
       NoteRepository.getAll(),
       SnippetRepository.getAll(),
       ToLearnRepository.getAll(),
       WatchLaterRepository.getAll(),
+      TechBlogRepository.getAll(),
       ProductivityRepository.getAll(),
     ])
 
@@ -97,6 +104,7 @@ export const BackupService = {
       snippetsCount: snippets.length,
       learnTopicsCount: learnTopics.length,
       watchLaterCount: watchLater.length,
+      techBlogsCount: techBlogs.length,
       focusSessionsCount: focusLog.length,
     }
   },
@@ -116,7 +124,7 @@ export const BackupService = {
     }
 
     if (includeData) {
-      const [todos, shortcuts, notes, snippets, learnTopics, watchLater, settings, pomodoroSettings, focusLog] =
+      const [todos, shortcuts, notes, snippets, learnTopics, watchLater, techBlogs, settings, pomodoroSettings, focusLog] =
         await Promise.all([
           TodoRepository.getAll(),
           ShortcutRepository.getAll(),
@@ -124,6 +132,7 @@ export const BackupService = {
           SnippetRepository.getAll(),
           ToLearnRepository.getAll(),
           WatchLaterRepository.getAll(),
+          TechBlogRepository.getAll(),
           SettingsRepository.get(),
           PomodoroRepository.getSettings(),
           ProductivityRepository.getAll(),
@@ -135,6 +144,7 @@ export const BackupService = {
       payload.snippets = snippets
       payload.learnTopics = learnTopics
       payload.watchLater = watchLater
+      payload.techBlogs = techBlogs
       payload.settings = settings
       payload.pomodoroSettings = pomodoroSettings
       payload.focusSessionLog = focusLog
@@ -199,6 +209,7 @@ export const BackupService = {
         'snippets' in obj ||
         'learnTopics' in obj ||
         'watchLater' in obj ||
+        'techBlogs' in obj ||
         'settings' in obj ||
         'widgetLayout' in obj
 
@@ -228,6 +239,9 @@ export const BackupService = {
       }
       if (Array.isArray(obj.watchLater)) {
         tasks.push(WatchLaterRepository.replaceAll(obj.watchLater))
+      }
+      if (Array.isArray(obj.techBlogs)) {
+        tasks.push(TechBlogRepository.replaceAll(obj.techBlogs))
       }
       if (obj.settings && typeof obj.settings === 'object') {
         tasks.push(SettingsRepository.update(obj.settings))
@@ -263,6 +277,7 @@ export const BackupService = {
         snippetsCount: Array.isArray(obj.snippets) ? obj.snippets.length : 0,
         learnTopicsCount: Array.isArray(obj.learnTopics) ? obj.learnTopics.length : 0,
         watchLaterCount: Array.isArray(obj.watchLater) ? obj.watchLater.length : 0,
+        techBlogsCount: Array.isArray(obj.techBlogs) ? obj.techBlogs.length : 0,
         focusSessionsCount: Array.isArray(obj.focusSessionLog) ? obj.focusSessionLog.length : 0,
       }
 
@@ -288,6 +303,7 @@ export const BackupService = {
       PomodoroRepository.saveSettings(DEFAULT_POMODORO_SETTINGS),
       ToLearnRepository.replaceAll(DEFAULT_LEARN_TOPICS),
       WatchLaterRepository.replaceAll(DEFAULT_WATCH_LATER),
+      TechBlogRepository.replaceAll(DEFAULT_TECH_BLOGS),
     ])
 
     if (typeof document !== 'undefined' && document.documentElement) {

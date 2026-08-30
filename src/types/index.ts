@@ -26,6 +26,7 @@ export interface Todo {
   endDate?: string // ISO date, e.g. "2026-08-30" or "2026-09-02"
   endTime?: string // "HH:MM", 24h
   isAllDay?: boolean // true for all-day and multi-day tasks without exact time
+  link?: string // documentation or external resource link
   dueDate?: string // legacy support, mapped to endDate
   dueTime?: string // legacy support, mapped to endTime
   createdAt: string
@@ -47,6 +48,7 @@ export type TodoDraft = Pick<Todo, 'title'> &
       | 'endDate'
       | 'endTime'
       | 'isAllDay'
+      | 'link'
       | 'dueDate'
       | 'dueTime'
       | 'tags'
@@ -318,6 +320,22 @@ export type WidgetType =
   | 'LEETCODE'
   | 'TO_LEARN'
   | 'WATCH_LATER'
+  | 'TECH_BLOGS'
+
+// ── Tech Blogs / Bookshelf ──────────────────────────────────────────
+
+export interface TechBlog {
+  id: string
+  name: string
+  url: string
+  description?: string
+  category?: string
+  iconUrl?: string
+  createdAt: string
+}
+
+export type TechBlogDraft = Pick<TechBlog, 'name' | 'url'> &
+  Partial<Pick<TechBlog, 'description' | 'category' | 'iconUrl'>>
 // Further types (CALENDAR, QUOTE, SYSTEM_STATUS) register the same way —
 // see widgets/registry.ts — once their components exist.
 

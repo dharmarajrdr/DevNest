@@ -39,6 +39,8 @@ interface Props {
 export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
   const { create, update } = useTodoStore()
   const [title, setTitle] = useState('')
+  const [link, setLink] = useState('')
+  const [linkError, setLinkError] = useState<string | null>(null)
   const [priority, setPriority] = useState<TodoPriority>('MEDIUM')
   const [startDate, setStartDate] = useState(todayISO())
   const [startTime, setStartTime] = useState('')
@@ -52,6 +54,8 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
 
   function reset() {
     setTitle('')
+    setLink('')
+    setLinkError(null)
     setPriority('MEDIUM')
     setStartDate(todayISO())
     setStartTime('')
@@ -68,6 +72,8 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
     if (open) {
       if (todoToEdit) {
         setTitle(todoToEdit.title)
+        setLink(todoToEdit.link || '')
+        setLinkError(null)
         setPriority(todoToEdit.priority)
         setStartDate(todoToEdit.startDate || todoToEdit.dueDate || todayISO())
         setStartTime(todoToEdit.startTime || (todoToEdit.isAllDay ? '' : todoToEdit.dueTime || ''))
@@ -110,9 +116,39 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
     recurrenceType !== 'NONE' && endDate && endDate < todayISO(),
   )
 
+  function validateUrl(str: string): string | null {
+    const trimmed = str.trim()
+    if (!trimmed) return null
+    let formatted = trimmed
+    if (!/^https?:\/\//i.test(formatted)) {
+      formatted = `https://${formatted}`
+    }
+    try {
+      const u = new URL(formatted)
+      if (!u.hostname || !u.hostname.includes('.')) {
+        return 'Please enter a valid URL (e.g. https://github.com/org/repo/pull/123 or docs link)'
+      }
+      return null
+    } catch {
+      return 'Please enter a valid URL'
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!title.trim() || isTimeInvalid || isEndDateInvalid) return
+
+    let formattedLink = link.trim()
+    if (formattedLink) {
+      const err = validateUrl(formattedLink)
+      if (err) {
+        setLinkError(err)
+        return
+      }
+      if (!/^https?:\/\//i.test(formattedLink)) {
+        formattedLink = `https://${formattedLink}`
+      }
+    }
 
     const effectiveStartDate = recurrenceType === 'NONE' ? (startDate || todayISO()) : todayISO()
 
@@ -147,6 +183,7 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
         endDate: recurrenceType === 'NONE' ? effectiveStartDate : endDate || undefined,
         endTime: endTime || undefined,
         isAllDay: !startTime && !endTime,
+        link: formattedLink || undefined,
         dueDate: recurrenceType === 'NONE' ? effectiveStartDate : endDate || effectiveStartDate,
         dueTime: endTime || startTime || undefined,
         recurrence,
@@ -160,6 +197,7 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
         endDate: recurrenceType === 'NONE' ? effectiveStartDate : endDate || undefined,
         endTime: endTime || undefined,
         isAllDay: !startTime && !endTime,
+        link: formattedLink || undefined,
         dueDate: recurrenceType === 'NONE' ? effectiveStartDate : endDate || effectiveStartDate,
         dueTime: endTime || startTime || undefined,
         recurrence,
@@ -191,6 +229,29 @@ export function TodoFormModal({ open, onClose, todoToEdit }: Props) {
             placeholder="What needs to get done?"
             className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:border-accent"
           />
+        </div>
+
+        {/* Link / URL */}
+        <div>
+          <label htmlFor="task-link" className="mb-1 block text-xs text-text-secondary">
+            Resource / Documentation Link (Optional)
+          </label>
+          <input
+            id="task-link"
+            value={link}
+            onChange={(e) => {
+              setLink(e.target.value)
+              if (linkError) setLinkError(null)
+            }}
+            placeholder="e.g. https://github.com/... or PR / Jira link"
+            className={cn(
+              'w-full rounded-lg border bg-bg px-3 py-2 text-xs text-text-primary placeholder:text-text-secondary focus:border-accent',
+              linkError ? 'border-danger/60' : 'border-border',
+            )}
+          />
+          {linkError && (
+            <p className="mt-1 text-[11px] text-danger animate-fadeIn">{linkError}</p>
+          )}
         </div>
 
         {/* Recurrence Selector */}

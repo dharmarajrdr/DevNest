@@ -24,14 +24,14 @@ import { parseYouTubeUrl } from '@/services/storage/repositories/WatchLaterRepos
 import type { WatchLaterItem } from '@/types'
 import { cn } from '@/utils/cn'
 
-type FilterTab = 'ALL' | 'UNWATCHED' | 'WATCHED'
+type FilterTab = 'UNWATCHED' | 'WATCHED'
 
 export function WatchLaterWidget() {
   const { items, loading, load, addByUrl, toggleComplete, remove } = useWatchLaterStore()
   const [modalOpen, setModalOpen] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<FilterTab>('ALL')
+  const [filter, setFilter] = useState<FilterTab>('UNWATCHED')
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [deletingItem, setDeletingItem] = useState<WatchLaterItem | null>(null)
@@ -78,8 +78,7 @@ export function WatchLaterWidget() {
 
       if (!matchesSearch) return false
       if (filter === 'UNWATCHED') return !item.completed
-      if (filter === 'WATCHED') return item.completed
-      return true
+      return item.completed
     })
   }, [items, search, filter])
 
@@ -127,7 +126,7 @@ export function WatchLaterWidget() {
             </div>
 
             <div className="flex gap-1">
-              {(['ALL', 'UNWATCHED', 'WATCHED'] as FilterTab[]).map((f) => (
+              {(['UNWATCHED', 'WATCHED'] as FilterTab[]).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -138,7 +137,7 @@ export function WatchLaterWidget() {
                       : 'text-text-secondary hover:text-text-primary',
                   )}
                 >
-                  {f === 'ALL' ? 'All' : f === 'UNWATCHED' ? 'To Watch' : 'Watched'}
+                  {f === 'UNWATCHED' ? 'To Watch' : 'Watched'}
                 </button>
               ))}
             </div>

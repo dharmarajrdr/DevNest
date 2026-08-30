@@ -27,7 +27,7 @@ import type { LearnStatus, LearnTopic, SkillLevel } from '@/types'
 import { cn } from '@/utils/cn'
 
 type ViewTab = 'topics' | 'skills'
-type TopicFilter = 'ALL' | 'IN_PROGRESS' | 'TO_LEARN'
+type TopicFilter = 'IN_PROGRESS' | 'TO_LEARN'
 
 const LEVEL_COLORS: Record<SkillLevel, { bg: string; text: string; border: string }> = {
   BEGINNER: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
@@ -39,7 +39,7 @@ const LEVEL_COLORS: Record<SkillLevel, { bg: string; text: string; border: strin
 export function ToLearnWidget() {
   const { topics, loading, load, create, update, toggleComplete, remove } = useToLearnStore()
   const [activeTab, setActiveTab] = useState<ViewTab>('topics')
-  const [filter, setFilter] = useState<TopicFilter>('ALL')
+  const [filter, setFilter] = useState<TopicFilter>('IN_PROGRESS')
   const [search, setSearch] = useState('')
 
   // Add / Edit modal state
@@ -125,7 +125,6 @@ export function ToLearnWidget() {
         t.notes?.toLowerCase().includes(search.toLowerCase())
 
       if (!matchSearch) return false
-      if (filter === 'ALL') return true
       return t.status === filter
     })
   }, [activeUncompletedTopics, search, filter])
@@ -209,7 +208,7 @@ export function ToLearnWidget() {
 
               {/* Status Filters */}
               <div className="flex gap-1">
-                {(['ALL', 'IN_PROGRESS', 'TO_LEARN'] as TopicFilter[]).map((f) => (
+                {(['IN_PROGRESS', 'TO_LEARN'] as TopicFilter[]).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
@@ -220,7 +219,7 @@ export function ToLearnWidget() {
                         : 'text-text-secondary hover:text-text-primary',
                     )}
                   >
-                    {f === 'ALL' ? 'All' : f === 'IN_PROGRESS' ? 'Learning' : 'To Learn'}
+                    {f === 'IN_PROGRESS' ? 'Learning' : 'To Learn'}
                   </button>
                 ))}
               </div>

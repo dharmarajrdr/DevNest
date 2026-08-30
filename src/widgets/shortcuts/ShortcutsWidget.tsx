@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { ShortcutFormModal } from './ShortcutFormModal'
 import { useShortcutStore } from '@/store/useShortcutStore'
+import { StorageService } from '@/services/storage/StorageService'
 import { cn } from '@/utils/cn'
 import type { Shortcut } from '@/types'
 
@@ -27,23 +28,13 @@ function faviconUrl(url: string): string {
   }
 }
 
-// function domainName(url: string): string {
-//   try {
-//     return new URL(url).hostname.replace(/^www\./, '')
-//   } catch {
-//     return ''
-//   }
-// }
-
-import { StorageService } from '@/services/storage/StorageService'
-
 const SORT_KEY = 'devtab.shortcutSortOrder'
 type SortOrder = 'default' | 'name-asc' | 'name-desc'
 
 export function ShortcutsWidget() {
   const { shortcuts, load, loading, remove } = useShortcutStore()
   const [formOpen, setFormOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [modalInitialCategory, setModalInitialCategory] = useState<string>('AI Tools')
   const [sortOrder, setSortOrder] = useState<SortOrder>('default')
   const [deletingShortcut, setDeletingShortcut] = useState<Shortcut | null>(null)
@@ -75,6 +66,14 @@ export function ShortcutsWidget() {
     return Array.from(set).sort()
   }, [shortcuts])
 
+  // Sync selectedCategory when activeCategories change
+  const currentCategory = useMemo(() => {
+    if (selectedCategory && activeCategories.includes(selectedCategory)) {
+      return selectedCategory
+    }
+    return activeCategories[0] || 'General'
+  }, [selectedCategory, activeCategories])
+
   // Grouped shortcuts mapping with sorting applied
   const groupedShortcuts = useMemo(() => {
     const map = new Map<string, Shortcut[]>()
@@ -100,7 +99,7 @@ export function ShortcutsWidget() {
   }, [shortcuts, sortOrder])
 
   function handleOpenCreate(category?: string) {
-    setModalInitialCategory(category || (selectedCategory !== 'All' ? selectedCategory : 'AI Tools'))
+    setModalInitialCategory(category || currentCategory || 'AI Tools')
     setFormOpen(true)
   }
 
@@ -110,6 +109,8 @@ export function ShortcutsWidget() {
       setDeletingShortcut(null)
     }
   }
+
+  const currentItems = groupedShortcuts.get(currentCategory) ?? []
 
   return (
     <Card className="flex h-full flex-col">
@@ -149,24 +150,12 @@ export function ShortcutsWidget() {
         </div>
       </CardHeader>
 
-      {/* Category Pills Tab Bar */}
+      {/* Category Pills Tab Bar without 'All' */}
       {activeCategories.length > 0 && (
         <div className="flex items-center gap-1 overflow-x-auto border-b border-border px-3 pb-2 pt-0.5 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('All')}
-            className={cn(
-              'rounded-md px-2.5 py-1 text-xs font-medium transition-colors whitespace-nowrap',
-              selectedCategory === 'All'
-                ? 'bg-accent/15 text-accent shadow-sm'
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface-elevated',
-            )}
-          >
-            All ({shortcuts.length})
-          </button>
           {activeCategories.map((cat) => {
             const count = groupedShortcuts.get(cat)?.length ?? 0
-            const isSelected = selectedCategory === cat
+            const isSelected = currentCategory === cat
             return (
               <button
                 key={cat}
@@ -183,7 +172,7 @@ export function ShortcutsWidget() {
                 <span
                   className={cn(
                     'text-[10px] rounded px-1 py-0.2',
-                    isSelected ? 'bg-accent/20 text-accent' : 'bg-surface-elevated text-text-secondary',
+                    isSelected ? 'bg-accent/20 text-accent font-bold' : 'bg-surface-elevated text-text-secondary',
                   )}
                 >
                   {count}
@@ -216,63 +205,28 @@ export function ShortcutsWidget() {
               </button>
             }
           />
-        ) : selectedCategory === 'All' ? (
-          /* Grouped View across all categories */
-          <div className="space-y-4">
-            {Array.from(groupedShortcuts.entries()).map(([categoryName, items]) => (
-              <div key={categoryName} className="space-y-2">
-                <div className="flex items-center justify-between border-b border-border/40 pb-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
-                    <Folder size={13} className="text-accent" />
-                    <span>{categoryName}</span>
-                    <span className="text-[10px] font-normal text-text-secondary">
-                      ({items.length})
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenCreate(categoryName)}
-                    className="text-[11px] text-text-secondary hover:text-accent flex items-center gap-0.5"
-                    title={`Add shortcut to ${categoryName}`}
-                  >
-                    <Plus size={12} /> Add
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {items.map((s) => (
-                    <ShortcutCard
-                      key={s.id}
-                      shortcut={s}
-                      onDeleteRequest={(shortcut) => setDeletingShortcut(shortcut)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         ) : (
-          /* Filtered Single Category View */
+          /* Filtered Active Category View */
           <div className="space-y-3">
             <div className="flex items-center justify-between border-b border-border/40 pb-1">
               <div className="flex items-center gap-1.5 text-xs font-bold text-text-primary">
                 <Folder size={13} className="text-accent" />
-                <span>{selectedCategory}</span>
+                <span>{currentCategory}</span>
                 <span className="text-[10px] font-normal text-text-secondary">
-                  ({groupedShortcuts.get(selectedCategory)?.length ?? 0})
+                  ({currentItems.length})
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => handleOpenCreate(selectedCategory)}
+                onClick={() => handleOpenCreate(currentCategory)}
                 className="text-[11px] text-accent hover:underline flex items-center gap-0.5"
               >
-                <Plus size={12} /> Add to {selectedCategory}
+                <Plus size={12} /> Add to {currentCategory}
               </button>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {(groupedShortcuts.get(selectedCategory) ?? []).map((s) => (
+              {currentItems.map((s) => (
                 <ShortcutCard
                   key={s.id}
                   shortcut={s}
@@ -318,37 +272,36 @@ function ShortcutCard({
         href={s.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-full flex-col items-center gap-1.5 min-w-0"
+        className="flex flex-col items-center gap-1.5 w-full overflow-hidden"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-surface border border-border/50">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-surface p-1 shadow-sm">
           {!imgError ? (
             <img
               src={faviconUrl(s.url)}
               alt=""
-              className="h-4 w-4 rounded"
+              className="h-4 w-4 object-contain"
               onError={() => setImgError(true)}
             />
           ) : (
             <Globe size={14} className="text-text-secondary" />
           )}
         </div>
-        <div className="w-full min-w-0">
-          <span className="block truncate text-xs font-semibold text-text-primary group-hover:text-accent transition-colors">
-            {s.title}
-          </span>
-          {/* <span className="block truncate text-[10px] text-text-secondary mt-0.5">
-            {domainName(s.url)}
-          </span> */}
-        </div>
+        <span className="w-full truncate text-xs font-medium text-text-primary group-hover:text-accent">
+          {s.title}
+        </span>
       </a>
+
       <button
-        aria-label={`Remove ${s.title}`}
-        onClick={() => onDeleteRequest(s)}
-        className="absolute right-1 top-1 hidden rounded p-1 text-text-secondary hover:bg-danger/10 hover:text-danger group-hover:block transition-colors"
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onDeleteRequest(s)
+        }}
+        title="Delete shortcut"
+        className="absolute right-1 top-1 rounded p-1 text-text-secondary opacity-0 transition-opacity hover:bg-surface hover:text-danger group-hover:opacity-100"
       >
         <Trash2 size={12} />
       </button>
     </div>
   )
 }
-
