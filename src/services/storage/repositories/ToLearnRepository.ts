@@ -3,59 +3,7 @@ import type { LearnTopic } from '@/types'
 
 const KEY = 'devtab.learnTopics'
 
-export const DEFAULT_LEARN_TOPICS: LearnTopic[] = [
-  {
-    id: 'topic-docker',
-    title: 'Docker',
-    category: 'DevOps & Containers',
-    level: 'BEGINNER',
-    status: 'IN_PROGRESS',
-    notes: 'Containers, Dockerfile, multi-stage builds, docker-compose.',
-    resourceLink: 'https://docs.docker.com/',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'topic-k8s',
-    title: 'Kubernetes',
-    category: 'DevOps & Cloud',
-    level: 'INTERMEDIATE',
-    status: 'TO_LEARN',
-    notes: 'Pods, Deployments, Services, Ingress, Helm charts.',
-    resourceLink: 'https://kubernetes.io/docs/',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'topic-grafana',
-    title: 'Grafana',
-    category: 'Observability & Metrics',
-    level: 'INTERMEDIATE',
-    status: 'TO_LEARN',
-    notes: 'Prometheus metrics, dashboard panels, alerting rules.',
-    resourceLink: 'https://grafana.com/docs/',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'topic-typescript',
-    title: 'TypeScript',
-    category: 'Programming',
-    level: 'ADVANCED',
-    status: 'COMPLETED',
-    notes: 'Generics, conditional types, mapped types, utility types.',
-    resourceLink: 'https://www.typescriptlang.org/docs/',
-    createdAt: new Date().toISOString(),
-    completedAt: new Date().toISOString(),
-  },
-  {
-    id: 'topic-rust',
-    title: 'Rust',
-    category: 'Systems Programming',
-    level: 'ADVANCED',
-    status: 'TO_LEARN',
-    notes: 'Ownership, borrowing, lifetimes, async/await, concurrency.',
-    resourceLink: 'https://www.rust-lang.org/learn',
-    createdAt: new Date().toISOString(),
-  },
-]
+export const DEFAULT_LEARN_TOPICS: LearnTopic[] = []
 
 export const ToLearnRepository = {
   async getAll(): Promise<LearnTopic[]> {

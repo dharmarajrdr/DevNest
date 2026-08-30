@@ -78,26 +78,7 @@ export async function fetchYouTubeInfo(url: string): Promise<{ title: string; th
   }
 }
 
-export const DEFAULT_WATCH_LATER: WatchLaterItem[] = [
-  {
-    id: 'yt-docker-1',
-    url: 'https://www.youtube.com/watch?v=pg19Z8LL06w',
-    title: 'Docker Tutorial for Beginners [Full Course]',
-    thumbnailUrl: 'https://img.youtube.com/vi/pg19Z8LL06w/hqdefault.jpg',
-    type: 'video',
-    completed: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'yt-k8s-1',
-    url: 'https://www.youtube.com/watch?v=X48VuDVv0do',
-    title: 'Kubernetes Course - Full Course for Beginners',
-    thumbnailUrl: 'https://img.youtube.com/vi/X48VuDVv0do/hqdefault.jpg',
-    type: 'video',
-    completed: false,
-    createdAt: new Date().toISOString(),
-  },
-]
+export const DEFAULT_WATCH_LATER: WatchLaterItem[] = []
 
 export const WatchLaterRepository = {
   async getAll(): Promise<WatchLaterItem[]> {

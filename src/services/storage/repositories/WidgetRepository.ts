@@ -10,7 +10,7 @@ export const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'stopwatch', type: 'STOPWATCH', x: 0, y: 8, w: 4, h: 4, visible: true, minimized: false },
   { id: 'timer', type: 'TIMER', x: 4, y: 8, w: 4, h: 4, visible: true, minimized: false },
   { id: 'pomodoro', type: 'POMODORO', x: 8, y: 8, w: 4, h: 4, visible: true, minimized: false },
-  { id: 'devtools', type: 'DEV_TOOLS', x: 0, y: 12, w: 4, h: 4, visible: true, minimized: false },
+  { id: 'devtools', type: 'DEV_TOOLS', x: 0, y: 12, w: 4, h: 5, visible: true, minimized: false },
   { id: 'snippets', type: 'SNIPPETS', x: 4, y: 12, w: 4, h: 5, visible: true, minimized: false },
   { id: 'notes', type: 'NOTES', x: 8, y: 12, w: 4, h: 5, visible: true, minimized: false },
   { id: 'tolearn', type: 'TO_LEARN', x: 0, y: 17, w: 6, h: 6, visible: true, minimized: false },
