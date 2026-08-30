@@ -193,7 +193,7 @@ export function SettingsPanel({ open, onClose }: Props) {
       bodyClassName="p-0 flex flex-col md:flex-row h-[580px] min-h-[580px] max-h-[580px] overflow-hidden"
     >
       {/* Sidebar Navigation */}
-      <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-border bg-surface/60 p-2 md:p-3 overflow-x-auto md:overflow-y-auto h-full">
+      <div className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r border-border bg-surface/60 p-2 md:p-3 overflow-x-auto md:overflow-y-auto max-h-[88vh]">
         <div className="flex md:flex-col gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon
