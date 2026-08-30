@@ -33,12 +33,12 @@ const LEETCODE_LEVEL_COLORS = [
 export function ContributionGraph({
   days,
   theme = 'github',
-  weeksToShow = 20,
+  weeksToShow = 52,
   className,
 }: Props) {
   const [hoveredDay, setHoveredDay] = useState<HeatmapDay | null>(null)
 
-  // Organize days into 7 rows x N weeks
+  // Organize days into 7 rows x N weeks (defaults to 52 weeks = 12 months)
   const { weeks, monthLabels } = useMemo(() => {
     if (!days || days.length === 0) return { weeks: [], monthLabels: [] }
 
@@ -82,6 +82,7 @@ export function ContributionGraph({
   }, [days, weeksToShow])
 
   const colorPalette = theme === 'leetcode' ? LEETCODE_LEVEL_COLORS : GITHUB_LEVEL_COLORS
+  const totalCols = Math.max(weeks.length, 1)
 
   function formatDate(dStr: string) {
     try {
@@ -98,37 +99,42 @@ export function ContributionGraph({
   }
 
   return (
-    <div className={cn('flex flex-col gap-1.5 overflow-x-auto select-none', className)}>
-      {/* Month Labels */}
-      <div className="flex text-[10px] text-text-secondary h-4 relative pl-6">
-        {monthLabels.map((m, idx) => (
-          <span
-            key={idx}
-            style={{ position: 'absolute', left: `${m.colIndex * 13 + 24}px` }}
-            className="font-medium"
-          >
-            {m.label}
-          </span>
-        ))}
+    <div className={cn('flex flex-col gap-1.5 w-full select-none', className)}>
+      {/* Month Labels aligned over responsive columns */}
+      <div className="flex text-[10px] text-text-secondary h-3.5 relative pl-6 pr-1 w-full overflow-hidden">
+        <div className="relative w-full h-full">
+          {monthLabels.map((m, idx) => {
+            const leftPercent = (m.colIndex / totalCols) * 100
+            return (
+              <span
+                key={idx}
+                style={{ left: `${leftPercent}%` }}
+                className="absolute font-medium transform -translate-x-1 whitespace-nowrap text-[9px] sm:text-[10px]"
+              >
+                {m.label}
+              </span>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Graph Area with Weekday Labels */}
-      <div className="flex gap-1 items-start">
+      {/* Graph Area with Weekday Labels and Full-Width Grid */}
+      <div className="flex gap-1.5 items-center w-full">
         {/* Day of Week Labels (Mon, Wed, Fri) */}
-        <div className="flex flex-col gap-1 text-[9px] text-text-secondary pr-1 font-mono leading-none pt-0.5">
-          <span className="h-2.5"></span>
-          <span className="h-2.5">Mon</span>
-          <span className="h-2.5"></span>
-          <span className="h-2.5">Wed</span>
-          <span className="h-2.5"></span>
-          <span className="h-2.5">Fri</span>
-          <span className="h-2.5"></span>
+        <div className="flex flex-col justify-between h-full text-[9px] text-text-secondary w-5 shrink-0 font-mono leading-none py-0.5 select-none">
+          <span className="opacity-0">.</span>
+          <span>Mon</span>
+          <span className="opacity-0">.</span>
+          <span>Wed</span>
+          <span className="opacity-0">.</span>
+          <span>Fri</span>
+          <span className="opacity-0">.</span>
         </div>
 
-        {/* Heatmap Columns */}
-        <div className="flex gap-1">
+        {/* Responsive Heatmap Columns spanning full width */}
+        <div className="flex flex-1 gap-[2px] sm:gap-[3px] w-full">
           {weeks.map((week, wIdx) => (
-            <div key={wIdx} className="flex flex-col gap-1">
+            <div key={wIdx} className="flex flex-1 flex-col gap-[2px] sm:gap-[3px] min-w-0">
               {week.map((day) => {
                 const isHovered = hoveredDay?.date === day.date
                 return (
@@ -137,9 +143,9 @@ export function ContributionGraph({
                     onMouseEnter={() => setHoveredDay(day)}
                     onMouseLeave={() => setHoveredDay(null)}
                     className={cn(
-                      'h-2.5 w-2.5 rounded-[2px] border transition-transform cursor-pointer',
+                      'w-full aspect-square rounded-[2px] border transition-all cursor-pointer',
                       colorPalette[day.level] || colorPalette[0],
-                      isHovered && 'scale-125 z-10 border-text-primary',
+                      isHovered && 'scale-150 z-20 border-text-primary shadow-sm',
                     )}
                     title={`${day.count} ${theme === 'leetcode' ? 'submissions' : 'contributions'} on ${formatDate(day.date)}`}
                   />
@@ -152,7 +158,7 @@ export function ContributionGraph({
 
       {/* Footer Info & Legend */}
       <div className="flex items-center justify-between text-[10px] text-text-secondary pt-1 px-1">
-        <div className="h-4">
+        <div className="h-4 truncate flex-1">
           {hoveredDay ? (
             <span className="text-text-primary font-medium">
               {hoveredDay.count}{' '}
@@ -160,11 +166,11 @@ export function ContributionGraph({
               {formatDate(hoveredDay.date)}
             </span>
           ) : (
-            <span>Hover over any day for activity details</span>
+            <span>Last 12 months • Hover over any day for activity details</span>
           )}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0 ml-2">
           <span>Less</span>
           {colorPalette.map((cls, idx) => (
             <div key={idx} className={cn('h-2 w-2 rounded-[2px] border', cls)} />
@@ -175,4 +181,3 @@ export function ContributionGraph({
     </div>
   )
 }
-

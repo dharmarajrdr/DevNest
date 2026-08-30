@@ -282,6 +282,7 @@ export type WidgetType =
   | 'NOTES'
   | 'PRODUCTIVITY'
   | 'GITHUB'
+  | 'LEETCODE'
 // Further types (CALENDAR, QUOTE, SYSTEM_STATUS) register the same way —
 // see widgets/registry.ts — once their components exist.
 

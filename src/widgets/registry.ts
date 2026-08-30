@@ -12,6 +12,7 @@ import { SnippetsWidget } from './snippets/SnippetsWidget'
 import { NotesWidget } from './notes/NotesWidget'
 import { ProductivityWidget } from './productivity/ProductivityWidget'
 import { GitHubWidget } from './github/GitHubWidget'
+import { LeetCodeWidget } from './leetcode/LeetCodeWidget'
 
 export interface WidgetDefinition {
   type: WidgetType
@@ -38,4 +39,5 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
   NOTES: { type: 'NOTES', title: 'Notes', icon: NotebookPen, component: NotesWidget },
   PRODUCTIVITY: { type: 'PRODUCTIVITY', title: 'Productivity', icon: BarChart3, component: ProductivityWidget },
   GITHUB: { type: 'GITHUB', title: 'GitHub Activity', icon: Github, component: GitHubWidget },
+  LEETCODE: { type: 'LEETCODE', title: 'LeetCode Activity', icon: Code2, component: LeetCodeWidget },
 }

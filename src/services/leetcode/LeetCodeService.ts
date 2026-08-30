@@ -112,17 +112,30 @@ export function calculateLeetCodeStreak(submissions: LeetCodeSubmissionDay[]): {
   }
 }
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
+
 export const LeetCodeService = {
   async getCachedData(): Promise<LeetCodeProfileData | null> {
     return (await StorageService.get<LeetCodeProfileData>(LEETCODE_CACHE_KEY)) ?? null
   },
 
-  async fetchUserData(username: string): Promise<LeetCodeProfileData> {
+  async fetchUserData(username: string, forceRefresh = false): Promise<LeetCodeProfileData> {
     if (!username.trim()) {
       throw new Error('Please provide a LeetCode username.')
     }
 
     const cleanUsername = username.trim()
+
+    if (!forceRefresh) {
+      const cached = await this.getCachedData()
+      if (cached && cached.username.toLowerCase() === cleanUsername.toLowerCase() && cached.lastFetched) {
+        const age = Date.now() - new Date(cached.lastFetched).getTime()
+        if (age < CACHE_TTL_MS) {
+          return cached
+        }
+      }
+    }
+
     let rawData: Record<string, any> | null = null
     let lastError: Error | null = null
 

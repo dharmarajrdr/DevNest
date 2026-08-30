@@ -24,6 +24,9 @@ export function BackupSection() {
   const [clearing, setClearing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [exportData, setExportData] = useState(true)
+  const [exportLayout, setExportLayout] = useState(true)
+
   async function loadSummary() {
     try {
       setLoading(true)
@@ -39,8 +42,9 @@ export function BackupSection() {
   }, [])
 
   async function handleExport() {
+    if (!exportData && !exportLayout) return
     try {
-      await BackupService.downloadBackupFile()
+      await BackupService.downloadBackupFile({ exportData, exportLayout })
     } catch (err) {
       console.error('Export failed', err)
     }
@@ -124,24 +128,53 @@ export function BackupSection() {
       )}
 
       {/* Export Section */}
-      <div className="rounded-lg border border-border bg-surface-elevated/40 p-4 space-y-3">
+      <div className="rounded-lg border border-border bg-surface-elevated/40 p-4 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
               <Download size={18} />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-text-primary">Export Entire Data</h4>
+              <h4 className="text-xs font-semibold text-text-primary">Export JSON Backup</h4>
               <p className="text-[11px] text-text-secondary mt-0.5 leading-relaxed">
-                Download a complete JSON backup file of all your tasks, shortcuts, notes, snippets,
-                custom settings, focus timer history, and widget layout.
+                Download a JSON backup containing your tasks, shortcuts, notes, snippets, settings, or dashboard layout.
               </p>
             </div>
           </div>
-          <Button size="sm" onClick={handleExport} disabled={loading} className="shrink-0">
+          <Button
+            size="sm"
+            onClick={handleExport}
+            disabled={loading || (!exportData && !exportLayout)}
+            className="shrink-0"
+          >
             <FileJson size={14} />
             Export JSON
           </Button>
+        </div>
+
+        {/* Export Preference Checkboxes */}
+        <div className="flex flex-wrap items-center gap-5 pt-1 border-t border-border/50 text-xs">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-text-secondary hover:text-text-primary">
+            <input
+              type="checkbox"
+              checked={exportData}
+              onChange={(e) => setExportData(e.target.checked)}
+              className="rounded border-border bg-bg text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <span className="font-medium text-text-primary">Export Data</span>
+            <span className="text-[11px] text-text-secondary">(Tasks, Notes, Shortcuts, Snippets, Settings)</span>
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none text-text-secondary hover:text-text-primary">
+            <input
+              type="checkbox"
+              checked={exportLayout}
+              onChange={(e) => setExportLayout(e.target.checked)}
+              className="rounded border-border bg-bg text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <span className="font-medium text-text-primary">Export Layout</span>
+            <span className="text-[11px] text-text-secondary">(Visual Grid Arrangement)</span>
+          </label>
         </div>
       </div>
 
@@ -171,10 +204,9 @@ export function BackupSection() {
             />
             <Button
               size="sm"
-              variant="secondary"
               disabled={importing}
               onClick={() => fileInputRef.current?.click()}
-              className="shrink-0"
+              className="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white"
             >
               {importing ? (
                 <>

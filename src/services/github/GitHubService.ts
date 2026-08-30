@@ -68,22 +68,32 @@ export function calculateStreaks(contributions: GitHubContributionDay[]): {
   }
 }
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
+
 export const GitHubService = {
   async getCachedData(): Promise<GitHubProfileData | null> {
     return (await StorageService.get<GitHubProfileData>(GITHUB_CACHE_KEY)) ?? null
   },
 
-  async fetchUserData(username: string, token?: string): Promise<GitHubProfileData> {
+  async fetchUserData(username: string, forceRefresh = false): Promise<GitHubProfileData> {
     if (!username.trim()) {
       throw new Error('Please provide a GitHub username.')
     }
 
     const cleanUsername = username.trim().toLowerCase()
+
+    if (!forceRefresh) {
+      const cached = await this.getCachedData()
+      if (cached && cached.username.toLowerCase() === cleanUsername && cached.lastFetched) {
+        const age = Date.now() - new Date(cached.lastFetched).getTime()
+        if (age < CACHE_TTL_MS) {
+          return cached
+        }
+      }
+    }
+
     const headers: Record<string, string> = {
       Accept: 'application/vnd.github.v3+json',
-    }
-    if (token && token.trim()) {
-      headers.Authorization = `Bearer ${token.trim()}`
     }
 
     // 1. Fetch user profile

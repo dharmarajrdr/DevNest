@@ -29,6 +29,20 @@ describe('BackupService', () => {
     expect(backup.widgetLayout).toBeDefined()
   })
 
+  it('supports selective export (data-only and layout-only)', async () => {
+    await TodoRepository.create({ title: 'Task Data' })
+
+    const dataOnly = await BackupService.exportBackup({ exportData: true, exportLayout: false })
+    expect(dataOnly.todos).toHaveLength(1)
+    expect(dataOnly.widgetLayout).toBeUndefined()
+    expect(dataOnly.exportScope).toEqual(['data'])
+
+    const layoutOnly = await BackupService.exportBackup({ exportData: false, exportLayout: true })
+    expect(layoutOnly.todos).toBeUndefined()
+    expect(layoutOnly.widgetLayout).toBeDefined()
+    expect(layoutOnly.exportScope).toEqual(['layout'])
+  })
+
   it('imports backup and restores complete state', async () => {
     const payload = {
       version: '0.4.0',

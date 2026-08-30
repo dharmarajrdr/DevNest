@@ -27,16 +27,22 @@ import { useSettingsStore } from '@/store/useSettingsStore'
 import { useWidgetStore } from '@/store/useWidgetStore'
 import { usePomodoroStore } from '@/store/usePomodoroStore'
 
+export interface ExportOptions {
+  exportData?: boolean
+  exportLayout?: boolean
+}
+
 export interface BackupPayload {
   version: string
   exportedAt: string
-  todos: Todo[]
-  shortcuts: Shortcut[]
-  notes: Note[]
-  snippets: Snippet[]
-  settings: Settings
-  widgetLayout: WidgetConfig[]
-  pomodoroSettings: PomodoroSettings
+  exportScope?: ('data' | 'layout')[]
+  todos?: Todo[]
+  shortcuts?: Shortcut[]
+  notes?: Note[]
+  snippets?: Snippet[]
+  settings?: Settings
+  widgetLayout?: WidgetConfig[]
+  pomodoroSettings?: PomodoroSettings
   focusSessionLog?: FocusSessionLogEntry[]
 }
 
@@ -79,35 +85,51 @@ export const BackupService = {
     }
   },
 
-  async exportBackup(): Promise<BackupPayload> {
-    const [todos, shortcuts, notes, snippets, settings, widgetLayout, pomodoroSettings, focusLog] =
-      await Promise.all([
-        TodoRepository.getAll(),
-        ShortcutRepository.getAll(),
-        NoteRepository.getAll(),
-        SnippetRepository.getAll(),
-        SettingsRepository.get(),
-        WidgetRepository.getLayout(),
-        PomodoroRepository.getSettings(),
-        ProductivityRepository.getAll(),
-      ])
+  async exportBackup(options: ExportOptions = { exportData: true, exportLayout: true }): Promise<BackupPayload> {
+    const includeData = options.exportData !== false
+    const includeLayout = options.exportLayout !== false
 
-    return {
+    const scope: ('data' | 'layout')[] = []
+    if (includeData) scope.push('data')
+    if (includeLayout) scope.push('layout')
+
+    const payload: BackupPayload = {
       version: '0.4.0',
       exportedAt: new Date().toISOString(),
-      todos,
-      shortcuts,
-      notes,
-      snippets,
-      settings,
-      widgetLayout,
-      pomodoroSettings,
-      focusSessionLog: focusLog,
+      exportScope: scope,
     }
+
+    if (includeData) {
+      const [todos, shortcuts, notes, snippets, settings, pomodoroSettings, focusLog] =
+        await Promise.all([
+          TodoRepository.getAll(),
+          ShortcutRepository.getAll(),
+          NoteRepository.getAll(),
+          SnippetRepository.getAll(),
+          SettingsRepository.get(),
+          PomodoroRepository.getSettings(),
+          ProductivityRepository.getAll(),
+        ])
+
+      payload.todos = todos
+      payload.shortcuts = shortcuts
+      payload.notes = notes
+      payload.snippets = snippets
+      payload.settings = settings
+      payload.pomodoroSettings = pomodoroSettings
+      payload.focusSessionLog = focusLog
+    }
+
+    if (includeLayout) {
+      const widgetLayout = await WidgetRepository.getLayout()
+      payload.widgetLayout = widgetLayout
+    }
+
+    return payload
   },
 
-  async downloadBackupFile(): Promise<void> {
-    const backup = await this.exportBackup()
+  async downloadBackupFile(options: ExportOptions = { exportData: true, exportLayout: true }): Promise<void> {
+    const backup = await this.exportBackup(options)
     const jsonStr = JSON.stringify(backup, null, 2)
     const blob = new Blob([jsonStr], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -115,7 +137,12 @@ export const BackupService = {
     const now = new Date()
     const dateStr = now.toISOString().slice(0, 10)
     const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`
-    const filename = `devnest-backup-${dateStr}-${timeStr}.json`
+
+    let prefix = 'devnest-backup'
+    if (options.exportData && !options.exportLayout) prefix = 'devnest-data-backup'
+    else if (!options.exportData && options.exportLayout) prefix = 'devnest-layout-backup'
+
+    const filename = `${prefix}-${dateStr}-${timeStr}.json`
 
     const link = document.createElement('a')
     link.href = url

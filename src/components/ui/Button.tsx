@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 }
 
 const variants = {
@@ -16,6 +16,7 @@ const variants = {
 const sizes = {
   sm: 'h-8 px-3 text-xs',
   md: 'h-9 px-4 text-sm',
+  lg: 'h-12 px-6 text-base',
 }
 
 export function Button({
