@@ -19,8 +19,13 @@ export interface Todo {
   description?: string
   status: TodoStatus
   priority: TodoPriority
-  dueDate?: string // ISO date, e.g. "2026-08-29"
-  dueTime?: string // "HH:MM", 24h
+  startDate?: string // ISO date, e.g. "2026-08-30"
+  startTime?: string // "HH:MM", 24h
+  endDate?: string // ISO date, e.g. "2026-08-30" or "2026-09-02"
+  endTime?: string // "HH:MM", 24h
+  isAllDay?: boolean // true for all-day and multi-day tasks without exact time
+  dueDate?: string // legacy support, mapped to endDate
+  dueTime?: string // legacy support, mapped to endTime
   createdAt: string
   updatedAt: string
   completedAt?: string
@@ -30,7 +35,23 @@ export interface Todo {
 }
 
 export type TodoDraft = Pick<Todo, 'title'> &
-  Partial<Pick<Todo, 'description' | 'priority' | 'dueDate' | 'dueTime' | 'tags' | 'recurrence' | 'recurringParentId'>>
+  Partial<
+    Pick<
+      Todo,
+      | 'description'
+      | 'priority'
+      | 'startDate'
+      | 'startTime'
+      | 'endDate'
+      | 'endTime'
+      | 'isAllDay'
+      | 'dueDate'
+      | 'dueTime'
+      | 'tags'
+      | 'recurrence'
+      | 'recurringParentId'
+    >
+  >
 
 // ── Shortcuts ────────────────────────────────────────────────────────
 

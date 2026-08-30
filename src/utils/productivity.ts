@@ -1,5 +1,5 @@
 import type { FocusSessionLogEntry, Todo } from '@/types'
-import { shiftISODate, todayISO } from './date'
+import { isTodayTask, shiftISODate, todayISO } from './date'
 
 function dateOf(iso: string): string {
   return iso.slice(0, 10)
@@ -168,11 +168,21 @@ export function generateHeatmapGrid(todos: Todo[], numWeeks = 20): HeatmapWeek[]
   return weeks
 }
 
-/** Completion rate among tasks due today; null if nothing is due today. */
+/** Completion rate among tasks active/scheduled for today; null if nothing is scheduled today. */
 export function completionRateToday(todos: Todo[]): { completed: number; total: number } | null {
-  const dueToday = todos.filter((t) => t.dueDate === todayISO())
-  if (dueToday.length === 0) return null
-  return { completed: dueToday.filter((t) => t.status === 'COMPLETED').length, total: dueToday.length }
+  const today = todayISO()
+  const todayTasks = todos.filter((t) => {
+    if (t.status === 'COMPLETED') {
+      return (
+        (t.completedAt && dateOf(t.completedAt) === today) ||
+        isTodayTask({ ...t, status: 'TODO' })
+      )
+    }
+    return isTodayTask(t)
+  })
+  if (todayTasks.length === 0) return null
+  const completed = todayTasks.filter((t) => t.status === 'COMPLETED').length
+  return { completed, total: todayTasks.length }
 }
 
 export function formatFocusMinutes(minutes: number): string {

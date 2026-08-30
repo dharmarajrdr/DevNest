@@ -24,40 +24,157 @@ export function isFutureDate(dateISO?: string): boolean {
   return dateISO > todayISO()
 }
 
-export function isCompleteable(todo: Todo): boolean {
-  if (todo.status === 'COMPLETED') return true
-  if (!todo.dueDate) return true
-  return !isFutureDate(todo.dueDate)
+export function getEffectiveStartDate(todo: Todo): string | undefined {
+  return todo.startDate || (!todo.endDate ? todo.dueDate : undefined)
 }
 
-export function isOverdue(todo: Todo): boolean {
-  if (!todo.dueDate || todo.status === 'COMPLETED') return false
-  if (todo.dueDate > todayISO()) return false
-  if (todo.dueDate < todayISO()) return true
-  // Same day: check dueTime
-  if (!todo.dueTime) return false
-  const [hours, minutes] = todo.dueTime.split(':').map(Number)
+export function getEffectiveStartTime(todo: Todo): string | undefined {
+  return todo.startTime || (!todo.endDate ? todo.dueTime : undefined)
+}
+
+export function getEffectiveEndDate(todo: Todo): string | undefined {
+  return todo.endDate || todo.dueDate || todo.startDate
+}
+
+export function getEffectiveEndTime(todo: Todo): string | undefined {
+  return todo.endTime || todo.dueTime
+}
+
+export function isAllDayTask(todo: Todo): boolean {
+  if (todo.isAllDay !== undefined) return todo.isAllDay
+  return !todo.startTime && !todo.endTime && !todo.dueTime && !!(todo.startDate || todo.endDate || todo.dueDate)
+}
+
+export function isTodayTask(todo: Todo): boolean {
+  if (todo.status === 'COMPLETED') return false
+  const start = getEffectiveStartDate(todo)
+  const end = getEffectiveEndDate(todo)
+  const today = todayISO()
+
+  if (!start && !end) return true // Undated tasks belong in Today's plan
+
+  if (start && end) {
+    return start <= today && today <= end
+  }
+  if (start) {
+    return start <= today
+  }
+  if (end) {
+    return end >= today
+  }
+  return false
+}
+
+export function isUpcomingTask(todo: Todo): boolean {
+  if (todo.status === 'COMPLETED') return false
+  const start = getEffectiveStartDate(todo)
+  const end = getEffectiveEndDate(todo)
+  const today = todayISO()
+
+  if (start) {
+    return start > today
+  }
+  if (end) {
+    return end > today
+  }
+  return false
+}
+
+export function isOverdueTask(todo: Todo): boolean {
+  if (todo.status === 'COMPLETED') return false
+  const end = getEffectiveEndDate(todo)
+  const endTime = getEffectiveEndTime(todo)
+  const today = todayISO()
+
+  if (!end) return false
+  if (end > today) return false
+  if (end < today) return true
+
+  // Same day as end date: check endTime if not all-day
+  if (isAllDayTask(todo) || !endTime) return false
+  const [hours, minutes] = endTime.split(':').map(Number)
   const now = new Date()
   const due = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0)
   return due.getTime() < now.getTime()
 }
 
+export function isCompleteable(todo: Todo): boolean {
+  if (todo.status === 'COMPLETED') return true
+  const start = getEffectiveStartDate(todo)
+  const end = getEffectiveEndDate(todo)
+  const today = todayISO()
+
+  // Future tasks (not yet started) cannot be completed
+  if (start && start > today) return false
+  if (!start && end && end > today) return false
+
+  return true
+}
+
+export function isOverdue(todo: Todo): boolean {
+  return isOverdueTask(todo)
+}
+
 export function isUpcoming(todo: Todo): boolean {
-  if (!todo.dueDate || todo.status === 'COMPLETED') return false
-  return !isToday(todo.dueDate) && !isOverdue(todo)
+  return isUpcomingTask(todo)
 }
 
 export function dueTimestamp(todo: Todo): number | null {
-  if (!todo.dueDate) return null
-  return new Date(`${todo.dueDate}T${todo.dueTime ?? '09:00'}:00`).getTime()
+  const start = getEffectiveStartDate(todo)
+  const end = getEffectiveEndDate(todo)
+  const date = start || end
+  if (!date) return null
+
+  const time = getEffectiveStartTime(todo) || getEffectiveEndTime(todo) || '09:00'
+  return new Date(`${date}T${time}:00`).getTime()
+}
+
+function formatShortDate(iso: string): string {
+  if (isToday(iso)) return 'Today'
+  return new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+export function formatTaskTimeframe(todo: Todo): string {
+  const start = getEffectiveStartDate(todo)
+  const end = getEffectiveEndDate(todo)
+  const startTime = getEffectiveStartTime(todo)
+  const endTime = getEffectiveEndTime(todo)
+  const allDay = isAllDayTask(todo)
+
+  if (!start && !end) return ''
+
+  const effectiveStart = start || end!
+  const effectiveEnd = end || start!
+  const isSameDay = effectiveStart === effectiveEnd
+
+  if (allDay) {
+    if (isSameDay) {
+      return isToday(effectiveStart) ? 'Today (All-day)' : `${formatShortDate(effectiveStart)} (All-day)`
+    }
+    return `${formatShortDate(effectiveStart)} – ${formatShortDate(effectiveEnd)} (All-day)`
+  }
+
+  // Timed task
+  if (isSameDay) {
+    const dateLabel = formatShortDate(effectiveStart)
+    if (startTime && endTime) return `${dateLabel}, ${startTime} – ${endTime}`
+    if (startTime) return `${dateLabel}, from ${startTime}`
+    if (endTime) return `${dateLabel}, by ${endTime}`
+    return dateLabel
+  }
+
+  // Multi-day timed task
+  if (startTime && endTime) {
+    return `${formatShortDate(effectiveStart)}, ${startTime} – ${formatShortDate(effectiveEnd)}, ${endTime}`
+  }
+  return `${formatShortDate(effectiveStart)} – ${formatShortDate(effectiveEnd)}`
 }
 
 export function formatDueLabel(todo: Todo): string {
-  if (!todo.dueDate) return ''
-  const label = isToday(todo.dueDate)
-    ? 'Today'
-    : new Date(`${todo.dueDate}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-  return todo.dueTime ? `${label}, ${todo.dueTime}` : label
+  return formatTaskTimeframe(todo)
 }
 
 export function computeNextDueDate(baseDateISO: string | undefined, recurrence: RecurrenceConfig): string {
@@ -97,6 +214,37 @@ export function computeNextDueDate(baseDateISO: string | undefined, recurrence: 
   }
 
   return shiftISODate(base, 1)
+}
+
+export function computeNextTimeframe(
+  startDate: string | undefined,
+  endDate: string | undefined,
+  recurrence: RecurrenceConfig,
+): { startDate?: string; endDate?: string } {
+  if (!startDate && !endDate) {
+    const next = computeNextDueDate(todayISO(), recurrence)
+    return { startDate: next, endDate: next }
+  }
+
+  const baseStart = startDate || endDate
+  const nextStart = computeNextDueDate(baseStart, recurrence)
+
+  if (!startDate || !endDate || startDate === endDate) {
+    return {
+      startDate: startDate ? nextStart : undefined,
+      endDate: endDate ? nextStart : undefined,
+    }
+  }
+
+  // Calculate day difference for multi-day spans
+  const [sy, sm, sd] = startDate.split('-').map(Number)
+  const [ey, em, ed] = endDate.split('-').map(Number)
+  const sDate = Date.UTC(sy, sm - 1, sd)
+  const eDate = Date.UTC(ey, em - 1, ed)
+  const spanDays = Math.round((eDate - sDate) / 86400000)
+
+  const nextEnd = shiftISODate(nextStart, spanDays)
+  return { startDate: nextStart, endDate: nextEnd }
 }
 
 function addMonthsToISODate(iso: string, months: number): string {

@@ -1,12 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import {
   computeNextDueDate,
+  computeNextTimeframe,
   formatRecurrenceLabel,
+  formatTaskTimeframe,
   isCompleteable,
   isFutureDate,
   isOverdue,
   isToday,
+  isTodayTask,
   isUpcoming,
+  isUpcomingTask,
   shiftISODate,
   todayISO,
 } from './date'
@@ -159,5 +163,66 @@ describe('formatRecurrenceLabel', () => {
     expect(formatRecurrenceLabel({ type: 'CUSTOM', interval: 2, unit: 'month' })).toBe(
       'Every 2 months',
     )
+  })
+})
+
+describe('isTodayTask and isUpcomingTask with date ranges', () => {
+  const today = todayISO()
+
+  it('recognizes multi-day task covering today as Today', () => {
+    const multiDay = makeTodo({
+      startDate: shiftISODate(today, -2),
+      endDate: shiftISODate(today, 3),
+      isAllDay: true,
+    })
+    expect(isTodayTask(multiDay)).toBe(true)
+    expect(isUpcomingTask(multiDay)).toBe(false)
+  })
+
+  it('recognizes future multi-day task as Upcoming', () => {
+    const futureMultiDay = makeTodo({
+      startDate: shiftISODate(today, 2),
+      endDate: shiftISODate(today, 5),
+      isAllDay: true,
+    })
+    expect(isTodayTask(futureMultiDay)).toBe(false)
+    expect(isUpcomingTask(futureMultiDay)).toBe(true)
+  })
+})
+
+describe('formatTaskTimeframe', () => {
+  it('formats all-day single day and multi-day spans', () => {
+    const singleAllDay = makeTodo({ startDate: '2026-08-30', isAllDay: true })
+    expect(formatTaskTimeframe(singleAllDay)).toContain('(All-day)')
+
+    const multiDayAllDay = makeTodo({
+      startDate: '2026-08-30',
+      endDate: '2026-09-02',
+      isAllDay: true,
+    })
+    expect(formatTaskTimeframe(multiDayAllDay)).toContain('–')
+    expect(formatTaskTimeframe(multiDayAllDay)).toContain('(All-day)')
+  })
+
+  it('formats timed task timeframes', () => {
+    const timedTask = makeTodo({
+      startDate: '2026-08-30',
+      startTime: '10:00',
+      endDate: '2026-08-30',
+      endTime: '12:30',
+      isAllDay: false,
+    })
+    expect(formatTaskTimeframe(timedTask)).toContain('10:00 – 12:30')
+  })
+})
+
+describe('computeNextTimeframe', () => {
+  it('preserves multi-day duration across recurring cycles', () => {
+    const next = computeNextTimeframe('2026-08-30', '2026-09-02', {
+      type: 'WEEKLY',
+      interval: 1,
+    })
+    expect(next.startDate).toBe('2026-09-06')
+    expect(next.endDate).toBe('2026-09-09')
   })
 })

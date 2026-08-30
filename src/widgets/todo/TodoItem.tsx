@@ -3,15 +3,17 @@ import type { Todo } from '@/types'
 import { PriorityBadge } from '@/components/ui/Badge'
 import { IconButton } from '@/components/ui/IconButton'
 import { cn } from '@/utils/cn'
-import { formatDueLabel, formatRecurrenceLabel, isFutureDate, isOverdue } from '@/utils/date'
+import { formatRecurrenceLabel, formatTaskTimeframe, isCompleteable, isOverdueTask } from '@/utils/date'
 import { useTodoStore } from '@/store/useTodoStore'
 
 export function TodoItem({ todo }: { todo: Todo }) {
   const { complete, restore, remove } = useTodoStore()
-  const overdue = isOverdue(todo)
-  const isFuture = isFutureDate(todo.dueDate)
+  const overdue = isOverdueTask(todo)
+  const completeable = isCompleteable(todo)
+  const isFuture = !completeable && todo.status !== 'COMPLETED'
   const done = todo.status === 'COMPLETED'
   const recurrenceLabel = formatRecurrenceLabel(todo.recurrence)
+  const timeframeLabel = formatTaskTimeframe(todo)
 
   return (
     <div
@@ -25,12 +27,12 @@ export function TodoItem({ todo }: { todo: Todo }) {
           done
             ? 'Mark as not done'
             : isFuture
-              ? 'Cannot complete future tasks until due date'
+              ? 'Cannot complete future tasks until start date'
               : 'Mark as done'
         }
         title={
           isFuture && !done
-            ? 'Cannot complete future tasks until due date'
+            ? 'Cannot complete future tasks until start date'
             : done
               ? 'Mark as not done'
               : 'Mark as done'
@@ -59,10 +61,10 @@ export function TodoItem({ todo }: { todo: Todo }) {
           {todo.title}
         </p>
         <div className="flex flex-wrap items-center gap-x-2 text-[11px]">
-          {todo.dueDate && (
+          {timeframeLabel && (
             <p className={cn(overdue ? 'text-danger' : 'text-text-secondary')}>
               {overdue ? 'Overdue · ' : ''}
-              {formatDueLabel(todo)}
+              {timeframeLabel}
             </p>
           )}
           {recurrenceLabel && (

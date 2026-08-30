@@ -1,7 +1,7 @@
 import { StorageService } from '../StorageService'
 import type { Todo, TodoDraft } from '@/types'
 import { generateId } from '@/utils/id'
-import { computeNextDueDate, isFutureDate } from '@/utils/date'
+import { computeNextTimeframe, isCompleteable } from '@/utils/date'
 
 const KEY = 'devtab.todos'
 
@@ -29,8 +29,13 @@ export const TodoRepository = {
       description: draft.description,
       status: 'TODO',
       priority: draft.priority ?? 'MEDIUM',
-      dueDate: draft.dueDate,
-      dueTime: draft.dueTime,
+      startDate: draft.startDate,
+      startTime: draft.startTime,
+      endDate: draft.endDate,
+      endTime: draft.endTime,
+      isAllDay: draft.isAllDay,
+      dueDate: draft.dueDate || draft.endDate,
+      dueTime: draft.dueTime || draft.endTime,
       tags: draft.tags ?? [],
       recurrence: draft.recurrence,
       recurringParentId: draft.recurringParentId,
@@ -64,7 +69,7 @@ export const TodoRepository = {
     const todo = all.find((t) => t.id === id)
     if (!todo) return undefined
 
-    if (isFutureDate(todo.dueDate)) {
+    if (!isCompleteable(todo)) {
       return undefined // Future tasks cannot be completed yet
     }
 
@@ -80,15 +85,24 @@ export const TodoRepository = {
 
     // If it's a recurring task, schedule the next occurrence
     if (todo.recurrence) {
-      const nextDueDate = computeNextDueDate(todo.dueDate, todo.recurrence)
+      const { startDate: nextStartDate, endDate: nextEndDate } = computeNextTimeframe(
+        todo.startDate || todo.dueDate,
+        todo.endDate || todo.dueDate,
+        todo.recurrence,
+      )
       const nextRecurringTodo: Todo = {
         id: generateId(),
         title: todo.title,
         description: todo.description,
         status: 'TODO',
         priority: todo.priority,
-        dueDate: nextDueDate,
-        dueTime: todo.dueTime,
+        startDate: nextStartDate,
+        startTime: todo.startTime,
+        endDate: nextEndDate,
+        endTime: todo.endTime,
+        isAllDay: todo.isAllDay,
+        dueDate: nextEndDate,
+        dueTime: todo.endTime || todo.dueTime,
         tags: todo.tags ?? [],
         recurrence: todo.recurrence,
         recurringParentId: todo.recurringParentId ?? todo.id,

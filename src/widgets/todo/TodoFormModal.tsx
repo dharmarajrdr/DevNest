@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
+import { Switch } from '@/components/ui/Switch'
 import type { RecurrenceConfig, RecurrenceType, RecurrenceUnit, TodoPriority } from '@/types'
 import { useTodoStore } from '@/store/useTodoStore'
 import { todayISO } from '@/utils/date'
@@ -30,8 +31,11 @@ export function TodoFormModal({ open, onClose }: { open: boolean; onClose: () =>
   const { create } = useTodoStore()
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState<TodoPriority>('MEDIUM')
-  const [dueDate, setDueDate] = useState('')
-  const [dueTime, setDueTime] = useState('')
+  const [isAllDay, setIsAllDay] = useState(false)
+  const [startDate, setStartDate] = useState(todayISO())
+  const [startTime, setStartTime] = useState('')
+  const [endDate, setEndDate] = useState(todayISO())
+  const [endTime, setEndTime] = useState('')
   const [recurrenceType, setRecurrenceType] = useState<RecurrenceOption>('NONE')
   const [customInterval, setCustomInterval] = useState(1)
   const [customUnit, setCustomUnit] = useState<RecurrenceUnit>('day')
@@ -40,12 +44,22 @@ export function TodoFormModal({ open, onClose }: { open: boolean; onClose: () =>
   function reset() {
     setTitle('')
     setPriority('MEDIUM')
-    setDueDate('')
-    setDueTime('')
+    setIsAllDay(false)
+    setStartDate(todayISO())
+    setStartTime('')
+    setEndDate(todayISO())
+    setEndTime('')
     setRecurrenceType('NONE')
     setCustomInterval(1)
     setCustomUnit('day')
     setSelectedDays([])
+  }
+
+  function handleStartDateChange(val: string) {
+    setStartDate(val)
+    if (!endDate || endDate < val) {
+      setEndDate(val)
+    }
   }
 
   function toggleDay(day: number) {
@@ -58,9 +72,8 @@ export function TodoFormModal({ open, onClose }: { open: boolean; onClose: () =>
     e.preventDefault()
     if (!title.trim()) return
 
-    // If recurring but no due date is picked, default due date to today
-    const effectiveDueDate =
-      recurrenceType !== 'NONE' && !dueDate ? todayISO() : dueDate || undefined
+    const effectiveStartDate = startDate || todayISO()
+    const effectiveEndDate = endDate || effectiveStartDate
 
     const recurrence: RecurrenceConfig | undefined =
       recurrenceType === 'NONE'
@@ -80,8 +93,13 @@ export function TodoFormModal({ open, onClose }: { open: boolean; onClose: () =>
     await create({
       title: title.trim(),
       priority,
-      dueDate: effectiveDueDate,
-      dueTime: dueTime || undefined,
+      startDate: effectiveStartDate,
+      startTime: isAllDay ? undefined : startTime || undefined,
+      endDate: effectiveEndDate,
+      endTime: isAllDay ? undefined : endTime || undefined,
+      isAllDay,
+      dueDate: effectiveEndDate,
+      dueTime: isAllDay ? undefined : endTime || undefined,
       recurrence,
     })
     reset()
@@ -105,33 +123,96 @@ export function TodoFormModal({ open, onClose }: { open: boolean; onClose: () =>
           />
         </div>
 
+        {/* All-Day Toggle */}
+        <div className="flex items-center justify-between rounded-lg border border-border bg-surface-elevated/30 px-3 py-2">
+          <div>
+            <span className="text-xs font-semibold text-text-primary">All-day event</span>
+            <p className="text-[10px] text-text-secondary">
+              Span one or multiple full days without specific times
+            </p>
+          </div>
+          <Switch
+            checked={isAllDay}
+            onChange={setIsAllDay}
+            size="sm"
+            label="All-day event"
+          />
+        </div>
+
+        {/* Start Date & Time */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="task-date" className="mb-1 block text-xs text-text-secondary">
-              Due date
+            <label htmlFor="task-start-date" className="mb-1 block text-xs text-text-secondary">
+              Start date
             </label>
             <input
-              id="task-date"
+              id="task-start-date"
               type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              value={startDate}
+              onChange={(e) => handleStartDateChange(e.target.value)}
               className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent"
             />
           </div>
-          <div>
-            <label htmlFor="task-time" className="mb-1 block text-xs text-text-secondary">
-              Due time
-            </label>
-            <input
-              id="task-time"
-              type="time"
-              value={dueTime}
-              onChange={(e) => setDueTime(e.target.value)}
-              disabled={!dueDate && recurrenceType === 'NONE'}
-              className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent disabled:opacity-40"
-            />
-          </div>
+          {!isAllDay ? (
+            <div>
+              <label htmlFor="task-start-time" className="mb-1 block text-xs text-text-secondary">
+                Start time
+              </label>
+              <input
+                id="task-start-time"
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent"
+              />
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="task-end-date" className="mb-1 block text-xs text-text-secondary">
+                End date
+              </label>
+              <input
+                id="task-end-date"
+                type="date"
+                min={startDate}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent"
+              />
+            </div>
+          )}
         </div>
+
+        {/* End Date & Time (if not all day) */}
+        {!isAllDay && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="task-end-date-timed" className="mb-1 block text-xs text-text-secondary">
+                End date
+              </label>
+              <input
+                id="task-end-date-timed"
+                type="date"
+                min={startDate}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent"
+              />
+            </div>
+            <div>
+              <label htmlFor="task-end-time" className="mb-1 block text-xs text-text-secondary">
+                End time
+              </label>
+              <input
+                id="task-end-time"
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text-primary focus:border-accent"
+              />
+            </div>
+          </div>
+        )}
 
         <div>
           <span className="mb-1 block text-xs text-text-secondary">Recurrence</span>

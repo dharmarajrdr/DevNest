@@ -8,7 +8,7 @@ import { TodoFormModal } from './TodoFormModal'
 import { TaskStreakView } from './TaskStreakView'
 import { useTodoStore } from '@/store/useTodoStore'
 import { useUIStore } from '@/store/useUIStore'
-import { isOverdue, isToday, isUpcoming } from '@/utils/date'
+import { isOverdueTask, isTodayTask, isUpcomingTask } from '@/utils/date'
 import { currentStreak } from '@/utils/productivity'
 import { cn } from '@/utils/cn'
 
@@ -37,13 +37,11 @@ export function TodoWidget() {
   const visible = useMemo(() => {
     switch (filter) {
       case 'today':
-        return todos.filter(
-          (t) => t.status !== 'COMPLETED' && (isToday(t.dueDate) || !t.dueDate),
-        )
+        return todos.filter((t) => isTodayTask(t))
       case 'upcoming':
-        return todos.filter((t) => isUpcoming(t))
+        return todos.filter((t) => isUpcomingTask(t))
       case 'overdue':
-        return todos.filter((t) => isOverdue(t))
+        return todos.filter((t) => isOverdueTask(t))
       case 'completed':
         return todos.filter((t) => t.status === 'COMPLETED')
       case 'streak':
