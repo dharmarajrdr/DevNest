@@ -5,6 +5,7 @@ import {
   Bell,
   LayoutGrid,
   Cloud,
+  Database,
   Keyboard,
   Info,
   Check,
@@ -27,6 +28,7 @@ import { useWidgetStore } from '@/store/useWidgetStore'
 import { theme } from '@/config/theme'
 import { WIDGET_REGISTRY } from '@/widgets/registry'
 import { SyncSection } from './SyncSection'
+import { BackupSection } from './BackupSection'
 import { cn } from '@/utils/cn'
 
 interface Props {
@@ -40,6 +42,7 @@ type TabKey =
   | 'notifications'
   | 'dashboard'
   | 'sync'
+  | 'backup'
   | 'shortcuts'
   | 'about'
 
@@ -86,6 +89,13 @@ const TABS: TabConfig[] = [
     icon: Cloud,
     badgeColor: 'text-cyan-400',
     badgeBg: 'bg-cyan-500/10',
+  },
+  {
+    key: 'backup',
+    label: 'Data & Backup',
+    icon: Database,
+    badgeColor: 'text-violet-400',
+    badgeBg: 'bg-violet-500/10',
   },
   {
     key: 'shortcuts',
@@ -557,6 +567,9 @@ export function SettingsPanel({ open, onClose }: Props) {
 
         {/* Sync Tab */}
         {activeTab === 'sync' && <SyncSection />}
+
+        {/* Data & Backup Tab */}
+        {activeTab === 'backup' && <BackupSection />}
 
         {/* Shortcuts Tab */}
         {activeTab === 'shortcuts' && (
