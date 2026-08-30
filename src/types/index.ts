@@ -3,6 +3,16 @@
 export type TodoStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED'
 export type TodoPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
 
+export type RecurrenceType = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'CUSTOM'
+export type RecurrenceUnit = 'day' | 'week' | 'month'
+
+export interface RecurrenceConfig {
+  type: RecurrenceType
+  interval?: number // e.g. every 2 weeks (default: 1)
+  unit?: RecurrenceUnit // for CUSTOM: 'day' | 'week' | 'month'
+  daysOfWeek?: number[] // 0 (Sun) - 6 (Sat)
+}
+
 export interface Todo {
   id: string
   title: string
@@ -15,10 +25,12 @@ export interface Todo {
   updatedAt: string
   completedAt?: string
   tags: string[]
+  recurrence?: RecurrenceConfig
+  recurringParentId?: string
 }
 
 export type TodoDraft = Pick<Todo, 'title'> &
-  Partial<Pick<Todo, 'description' | 'priority' | 'dueDate' | 'dueTime' | 'tags'>>
+  Partial<Pick<Todo, 'description' | 'priority' | 'dueDate' | 'dueTime' | 'tags' | 'recurrence' | 'recurringParentId'>>
 
 // ── Shortcuts ────────────────────────────────────────────────────────
 

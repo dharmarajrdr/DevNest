@@ -1,22 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ListTodo, Plus } from 'lucide-react'
+import { Flame, ListTodo, Plus } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { IconButton } from '@/components/ui/IconButton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { TodoItem } from './TodoItem'
 import { TodoFormModal } from './TodoFormModal'
+import { TaskStreakView } from './TaskStreakView'
 import { useTodoStore } from '@/store/useTodoStore'
 import { useUIStore } from '@/store/useUIStore'
 import { isOverdue, isToday, isUpcoming } from '@/utils/date'
+import { currentStreak } from '@/utils/productivity'
 import { cn } from '@/utils/cn'
 
-type Filter = 'today' | 'upcoming' | 'overdue' | 'completed'
+type Filter = 'today' | 'upcoming' | 'overdue' | 'completed' | 'streak'
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'today', label: 'Today' },
   { key: 'upcoming', label: 'Upcoming' },
   { key: 'overdue', label: 'Overdue' },
   { key: 'completed', label: 'Completed' },
+  { key: 'streak', label: 'Streak' },
 ]
 
 export function TodoWidget() {
@@ -28,6 +31,8 @@ export function TodoWidget() {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const streak = useMemo(() => currentStreak(todos), [todos])
 
   const visible = useMemo(() => {
     switch (filter) {
@@ -41,13 +46,22 @@ export function TodoWidget() {
         return todos.filter((t) => isOverdue(t))
       case 'completed':
         return todos.filter((t) => t.status === 'COMPLETED')
+      case 'streak':
+        return []
     }
   }, [todos, filter])
 
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle>Tasks</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle>Tasks</CardTitle>
+          {streak > 0 && (
+            <span className="flex items-center gap-0.5 text-xs font-semibold text-amber-500">
+              <Flame size={13} className="fill-amber-500/20" /> {streak}
+            </span>
+          )}
+        </div>
         <IconButton icon={<Plus size={16} />} label="Add task" onClick={() => setFormOpen(true)} />
       </CardHeader>
 
@@ -57,42 +71,47 @@ export function TodoWidget() {
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={cn(
-              'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+              'flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
               filter === f.key
                 ? 'bg-accent/15 text-accent'
                 : 'text-text-secondary hover:text-text-primary',
             )}
           >
+            {f.key === 'streak' && <Flame size={12} />}
             {f.label}
           </button>
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-2">
-        {loading ? (
-          <div className="space-y-2 p-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-8 animate-pulse rounded-lg bg-surface-elevated" />
-            ))}
-          </div>
-        ) : visible.length === 0 ? (
-          <EmptyState
-            icon={<ListTodo size={28} />}
-            title="No tasks here"
-            description="Plan your day and get things done."
-            action={
-              <button
-                onClick={() => setFormOpen(true)}
-                className="text-xs font-medium text-accent hover:underline"
-              >
-                + Add task
-              </button>
-            }
-          />
-        ) : (
-          visible.map((todo) => <TodoItem key={todo.id} todo={todo} />)
-        )}
-      </div>
+      {filter === 'streak' ? (
+        <TaskStreakView todos={todos} />
+      ) : (
+        <div className="flex-1 overflow-y-auto px-3 py-2">
+          {loading ? (
+            <div className="space-y-2 p-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-8 animate-pulse rounded-lg bg-surface-elevated" />
+              ))}
+            </div>
+          ) : visible.length === 0 ? (
+            <EmptyState
+              icon={<ListTodo size={28} />}
+              title="No tasks here"
+              description="Plan your day and get things done."
+              action={
+                <button
+                  onClick={() => setFormOpen(true)}
+                  className="text-xs font-medium text-accent hover:underline"
+                >
+                  + Add task
+                </button>
+              }
+            />
+          ) : (
+            visible.map((todo) => <TodoItem key={todo.id} todo={todo} />)
+          )}
+        </div>
+      )}
 
       <TodoFormModal open={formOpen} onClose={() => setFormOpen(false)} />
     </Card>

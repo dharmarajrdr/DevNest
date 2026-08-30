@@ -1,15 +1,17 @@
-import { Check, RotateCcw, Trash2 } from 'lucide-react'
+import { Check, Repeat, RotateCcw, Trash2 } from 'lucide-react'
 import type { Todo } from '@/types'
 import { PriorityBadge } from '@/components/ui/Badge'
 import { IconButton } from '@/components/ui/IconButton'
 import { cn } from '@/utils/cn'
-import { formatDueLabel, isOverdue } from '@/utils/date'
+import { formatDueLabel, formatRecurrenceLabel, isFutureDate, isOverdue } from '@/utils/date'
 import { useTodoStore } from '@/store/useTodoStore'
 
 export function TodoItem({ todo }: { todo: Todo }) {
   const { complete, restore, remove } = useTodoStore()
   const overdue = isOverdue(todo)
+  const isFuture = isFutureDate(todo.dueDate)
   const done = todo.status === 'COMPLETED'
+  const recurrenceLabel = formatRecurrenceLabel(todo.recurrence)
 
   return (
     <div
@@ -19,11 +21,29 @@ export function TodoItem({ todo }: { todo: Todo }) {
       )}
     >
       <button
-        aria-label={done ? 'Mark as not done' : 'Mark as done'}
+        aria-label={
+          done
+            ? 'Mark as not done'
+            : isFuture
+              ? 'Cannot complete future tasks until due date'
+              : 'Mark as done'
+        }
+        title={
+          isFuture && !done
+            ? 'Cannot complete future tasks until due date'
+            : done
+              ? 'Mark as not done'
+              : 'Mark as done'
+        }
+        disabled={isFuture && !done}
         onClick={() => (done ? restore(todo.id) : complete(todo.id))}
         className={cn(
           'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors',
-          done ? 'border-accent bg-accent text-white' : 'border-border hover:border-accent',
+          done
+            ? 'border-accent bg-accent text-white'
+            : isFuture
+              ? 'cursor-not-allowed border-border/40 bg-surface-elevated/30 opacity-40'
+              : 'border-border hover:border-accent',
         )}
       >
         {done && <Check size={12} strokeWidth={3} />}
@@ -38,12 +58,23 @@ export function TodoItem({ todo }: { todo: Todo }) {
         >
           {todo.title}
         </p>
-        {todo.dueDate && (
-          <p className={cn('text-[11px]', overdue ? 'text-danger' : 'text-text-secondary')}>
-            {overdue ? 'Overdue · ' : ''}
-            {formatDueLabel(todo)}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-x-2 text-[11px]">
+          {todo.dueDate && (
+            <p className={cn(overdue ? 'text-danger' : 'text-text-secondary')}>
+              {overdue ? 'Overdue · ' : ''}
+              {formatDueLabel(todo)}
+            </p>
+          )}
+          {recurrenceLabel && (
+            <span
+              title={`Recurring: ${recurrenceLabel}`}
+              className="flex items-center gap-0.5 text-[10px] text-accent font-medium"
+            >
+              <Repeat size={10} />
+              {recurrenceLabel}
+            </span>
+          )}
+        </div>
       </div>
 
       {!done && <PriorityBadge priority={todo.priority} />}

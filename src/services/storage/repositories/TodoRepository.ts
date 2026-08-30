@@ -1,6 +1,7 @@
 import { StorageService } from '../StorageService'
 import type { Todo, TodoDraft } from '@/types'
 import { generateId } from '@/utils/id'
+import { computeNextDueDate, isFutureDate } from '@/utils/date'
 
 const KEY = 'devtab.todos'
 
@@ -31,6 +32,8 @@ export const TodoRepository = {
       dueDate: draft.dueDate,
       dueTime: draft.dueTime,
       tags: draft.tags ?? [],
+      recurrence: draft.recurrence,
+      recurringParentId: draft.recurringParentId,
       createdAt: now,
       updatedAt: now,
     }
@@ -57,7 +60,46 @@ export const TodoRepository = {
   },
 
   async complete(id: string): Promise<Todo | undefined> {
-    return this.update(id, { status: 'COMPLETED', completedAt: new Date().toISOString() })
+    const all = await getAll()
+    const todo = all.find((t) => t.id === id)
+    if (!todo) return undefined
+
+    if (isFutureDate(todo.dueDate)) {
+      return undefined // Future tasks cannot be completed yet
+    }
+
+    const now = new Date().toISOString()
+    const completedTodo: Todo = {
+      ...todo,
+      status: 'COMPLETED',
+      completedAt: now,
+      updatedAt: now,
+    }
+
+    const nextTodos = all.map((t) => (t.id === id ? completedTodo : t))
+
+    // If it's a recurring task, schedule the next occurrence
+    if (todo.recurrence) {
+      const nextDueDate = computeNextDueDate(todo.dueDate, todo.recurrence)
+      const nextRecurringTodo: Todo = {
+        id: generateId(),
+        title: todo.title,
+        description: todo.description,
+        status: 'TODO',
+        priority: todo.priority,
+        dueDate: nextDueDate,
+        dueTime: todo.dueTime,
+        tags: todo.tags ?? [],
+        recurrence: todo.recurrence,
+        recurringParentId: todo.recurringParentId ?? todo.id,
+        createdAt: now,
+        updatedAt: now,
+      }
+      nextTodos.push(nextRecurringTodo)
+    }
+
+    await saveAll(nextTodos)
+    return completedTodo
   },
 
   async restore(id: string): Promise<Todo | undefined> {

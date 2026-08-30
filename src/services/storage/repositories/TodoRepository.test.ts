@@ -54,4 +54,35 @@ describe('TodoRepository', () => {
     const result = await TodoRepository.update('does-not-exist', { title: 'x' })
     expect(result).toBeUndefined()
   })
+
+  it('complete() does not complete tasks with future due date', async () => {
+    const futureDate = new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10)
+    const todo = await TodoRepository.create({ title: 'Future task', dueDate: futureDate })
+    const result = await TodoRepository.complete(todo.id)
+    expect(result).toBeUndefined()
+    const all = await TodoRepository.getAll()
+    expect(all[0].status).toBe('TODO')
+  })
+
+  it('completing a recurring task generates the next occurrence', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+    const todo = await TodoRepository.create({
+      title: 'Daily Standup',
+      dueDate: today,
+      recurrence: { type: 'DAILY', interval: 1 },
+    })
+
+    const completed = await TodoRepository.complete(todo.id)
+    expect(completed?.status).toBe('COMPLETED')
+    expect(completed?.completedAt).toBeTruthy()
+
+    const all = await TodoRepository.getAll()
+    expect(all).toHaveLength(2)
+    const nextTask = all.find((t) => t.id !== todo.id)
+    expect(nextTask).toBeDefined()
+    expect(nextTask?.status).toBe('TODO')
+    expect(nextTask?.title).toBe('Daily Standup')
+    expect(nextTask?.recurrence).toEqual({ type: 'DAILY', interval: 1 })
+    expect(nextTask?.dueDate).toBeTruthy()
+  })
 })

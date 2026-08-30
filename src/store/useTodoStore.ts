@@ -53,13 +53,19 @@ export const useTodoStore = create<TodoState>((set, get) => ({
     const updated = await TodoRepository.complete(id)
     if (!updated) return
     await TaskAlarmService.cancel(id)
-    set((s) => ({ todos: s.todos.map((t) => (t.id === id ? updated : t)) }))
+    const todos = await TodoRepository.getAll()
+    set({ todos })
+    const notifs = useSettingsStore.getState().settings.notifications
+    for (const t of todos) {
+      if (t.status !== 'COMPLETED') await TaskAlarmService.schedule(t, notifs)
+    }
   },
 
   restore: async (id) => {
     const updated = await TodoRepository.restore(id)
     if (!updated) return
-    set((s) => ({ todos: s.todos.map((t) => (t.id === id ? updated : t)) }))
+    const todos = await TodoRepository.getAll()
+    set({ todos })
     await resync(id, get)
   },
 }))
