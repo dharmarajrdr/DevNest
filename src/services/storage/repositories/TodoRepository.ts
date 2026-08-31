@@ -1,7 +1,7 @@
 import { StorageService } from '../StorageService'
 import type { Todo, TodoDraft } from '@/types'
-import { generateId } from '@/utils/id'
-import { computeNextTimeframe, isCompleteable } from '@/utils/date'
+import { generateTaskId } from '@/utils/id'
+import { computeNextTimeframe, isCompleteable, todayISO } from '@/utils/date'
 
 const KEY = 'devtab.todos'
 
@@ -24,7 +24,7 @@ export const TodoRepository = {
   async create(draft: TodoDraft): Promise<Todo> {
     const now = new Date().toISOString()
     const todo: Todo = {
-      id: generateId(),
+      id: draft.id || generateTaskId(),
       title: draft.title,
       description: draft.description,
       status: 'TODO',
@@ -34,11 +34,14 @@ export const TodoRepository = {
       endDate: draft.endDate,
       endTime: draft.endTime,
       isAllDay: draft.isAllDay,
+      link: draft.link,
       dueDate: draft.dueDate || draft.endDate,
       dueTime: draft.dueTime || draft.endTime,
       tags: draft.tags ?? [],
       recurrence: draft.recurrence,
       recurringParentId: draft.recurringParentId,
+      spawnedFromId: draft.spawnedFromId,
+      spawnedChildId: draft.spawnedChildId,
       createdAt: now,
       updatedAt: now,
     }
@@ -74,26 +77,31 @@ export const TodoRepository = {
     }
 
     const now = new Date().toISOString()
+    const today = todayISO()
+    const nextChildId = todo.recurrence ? generateTaskId() : undefined
+
     const completedTodo: Todo = {
       ...todo,
       status: 'COMPLETED',
       completedAt: now,
       updatedAt: now,
+      spawnedChildId: nextChildId,
     }
 
     const nextTodos = all.map((t) => (t.id === id ? completedTodo : t))
 
-    // If it's a recurring task, schedule the next occurrence
-    if (todo.recurrence) {
+    // If it's a recurring task, schedule the next occurrence relative to today
+    if (todo.recurrence && nextChildId) {
       const nextTimeframe = computeNextTimeframe(
         todo.startDate || todo.dueDate,
         todo.endDate || todo.dueDate,
         todo.recurrence,
+        today,
       )
       if (nextTimeframe) {
         const { startDate: nextStartDate, endDate: nextEndDate } = nextTimeframe
         const nextRecurringTodo: Todo = {
-          id: generateId(),
+          id: nextChildId,
           title: todo.title,
           description: todo.description,
           status: 'TODO',
@@ -103,11 +111,13 @@ export const TodoRepository = {
           endDate: nextEndDate,
           endTime: todo.endTime,
           isAllDay: todo.isAllDay,
+          link: todo.link,
           dueDate: nextEndDate,
           dueTime: todo.endTime || todo.dueTime,
           tags: todo.tags ?? [],
           recurrence: todo.recurrence,
           recurringParentId: todo.recurringParentId ?? todo.id,
+          spawnedFromId: todo.id,
           createdAt: now,
           updatedAt: now,
         }
@@ -120,6 +130,29 @@ export const TodoRepository = {
   },
 
   async restore(id: string): Promise<Todo | undefined> {
-    return this.update(id, { status: 'TODO', completedAt: undefined })
+    const all = await getAll()
+    const todo = all.find((t) => t.id === id)
+    if (!todo) return undefined
+
+    const now = new Date().toISOString()
+    const restoredTodo: Todo = {
+      ...todo,
+      status: 'TODO',
+      completedAt: undefined,
+      updatedAt: now,
+      spawnedChildId: undefined,
+    }
+
+    // Filter out any uncompleted (TODO) occurrence that was spawned by this task
+    const nextTodos = all
+      .filter((t) => {
+        if (t.spawnedFromId === id && t.status === 'TODO') return false
+        if (todo.spawnedChildId && t.id === todo.spawnedChildId && t.status === 'TODO') return false
+        return true
+      })
+      .map((t) => (t.id === id ? restoredTodo : t))
+
+    await saveAll(nextTodos)
+    return restoredTodo
   },
 }

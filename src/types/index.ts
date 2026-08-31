@@ -35,12 +35,15 @@ export interface Todo {
   tags: string[]
   recurrence?: RecurrenceConfig
   recurringParentId?: string
+  spawnedFromId?: string
+  spawnedChildId?: string
 }
 
 export type TodoDraft = Pick<Todo, 'title'> &
   Partial<
     Pick<
       Todo,
+      | 'id'
       | 'description'
       | 'priority'
       | 'startDate'
@@ -54,6 +57,8 @@ export type TodoDraft = Pick<Todo, 'title'> &
       | 'tags'
       | 'recurrence'
       | 'recurringParentId'
+      | 'spawnedFromId'
+      | 'spawnedChildId'
     >
   >
 

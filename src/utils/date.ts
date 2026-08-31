@@ -51,6 +51,65 @@ export function isTodayTask(todo: Todo): boolean {
   const end = getEffectiveEndDate(todo)
   const today = todayISO()
 
+  // Recurring tasks active on or before today
+  if (todo.recurrence) {
+    const { type, daysOfWeek, daysOfMonth, endDate: recurrenceEndDate } = todo.recurrence
+    // If the recurrence series has an end date that has already passed, it's ended
+    if (recurrenceEndDate && recurrenceEndDate < today) return false
+
+    // Future start date series not started yet
+    if (start && start > today) return false
+
+    if (type === 'DAILY') {
+      return true
+    }
+
+    if (type === 'WEEKLY') {
+      if (daysOfWeek && daysOfWeek.length > 0) {
+        const currentDayOfWeek = new Date().getDay()
+        return daysOfWeek.includes(currentDayOfWeek)
+      }
+      if (start) {
+        const [y, m, d] = start.split('-').map(Number)
+        const startDayOfWeek = new Date(Date.UTC(y, m - 1, d)).getUTCDay()
+        return new Date().getDay() === startDayOfWeek
+      }
+      return true
+    }
+
+    if (type === 'MONTHLY') {
+      const currentDayOfMonth = new Date().getDate()
+      if (daysOfMonth && daysOfMonth.length > 0) {
+        return daysOfMonth.includes(currentDayOfMonth)
+      }
+      if (start) {
+        const [, , d] = start.split('-').map(Number)
+        return currentDayOfMonth === d
+      }
+      return true
+    }
+
+    if (type === 'CUSTOM') {
+      const unit = todo.recurrence.unit ?? 'day'
+      if (unit === 'day') return true
+      if (unit === 'week') {
+        if (daysOfWeek && daysOfWeek.length > 0) {
+          return daysOfWeek.includes(new Date().getDay())
+        }
+        return true
+      }
+      if (unit === 'month') {
+        if (daysOfMonth && daysOfMonth.length > 0) {
+          return daysOfMonth.includes(new Date().getDate())
+        }
+        return true
+      }
+    }
+
+    return true
+  }
+
+  // Non-recurring tasks
   if (!start && !end) return true // Undated tasks belong in Today's plan
 
   if (start && end) {
@@ -71,6 +130,14 @@ export function isUpcomingTask(todo: Todo): boolean {
   const end = getEffectiveEndDate(todo)
   const today = todayISO()
 
+  // If active today, it is not upcoming
+  if (isTodayTask(todo)) return false
+
+  if (todo.recurrence) {
+    if (start && start > today) return true
+    return false
+  }
+
   if (start) {
     return start > today
   }
@@ -86,6 +153,21 @@ export function isOverdueTask(todo: Todo): boolean {
   const endTime = getEffectiveEndTime(todo)
   const today = todayISO()
 
+  if (todo.recurrence) {
+    if (todo.recurrence.endDate && todo.recurrence.endDate < today) {
+      return true
+    }
+    if (isTodayTask(todo)) {
+      if (isAllDayTask(todo) || !endTime) return false
+      const [hours, minutes] = endTime.split(':').map(Number)
+      const now = new Date()
+      const due = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0)
+      return due.getTime() < now.getTime()
+    }
+    if (end && end < today) return true
+    return false
+  }
+
   if (!end) return false
   if (end > today) return false
   if (end < today) return true
@@ -100,6 +182,7 @@ export function isOverdueTask(todo: Todo): boolean {
 
 export function isCompleteable(todo: Todo): boolean {
   if (todo.status === 'COMPLETED') return true
+  if (isTodayTask(todo)) return true
   const start = getEffectiveStartDate(todo)
   const end = getEffectiveEndDate(todo)
   const today = todayISO()
@@ -143,6 +226,16 @@ export function formatTaskTimeframe(todo: Todo): string {
   const startTime = getEffectiveStartTime(todo)
   const endTime = getEffectiveEndTime(todo)
   const allDay = isAllDayTask(todo)
+
+  if (todo.recurrence && isTodayTask(todo)) {
+    if (allDay) {
+      return 'Today (All-day)'
+    }
+    if (startTime && endTime) return `Today, ${startTime} – ${endTime}`
+    if (startTime) return `Today, from ${startTime}`
+    if (endTime) return `Today, by ${endTime}`
+    return 'Today'
+  }
 
   if (!start && !end) return ''
 
@@ -231,15 +324,18 @@ export function computeNextTimeframe(
   startDate: string | undefined,
   endDate: string | undefined,
   recurrence: RecurrenceConfig,
+  referenceDate?: string,
 ): { startDate?: string; endDate?: string } | null {
   if (!startDate && !endDate) {
-    const next = computeNextDueDate(todayISO(), recurrence)
+    const base = referenceDate || todayISO()
+    const next = computeNextDueDate(base, recurrence)
     if (recurrence.endDate && next > recurrence.endDate) return null
     return { startDate: next, endDate: next }
   }
 
-  const baseStart = startDate || endDate
-  const nextStart = computeNextDueDate(baseStart, recurrence)
+  const rawStart = startDate || endDate!
+  const effectiveBaseStart = referenceDate && rawStart < referenceDate ? referenceDate : rawStart
+  const nextStart = computeNextDueDate(effectiveBaseStart, recurrence)
 
   if (recurrence.endDate && nextStart > recurrence.endDate) {
     return null
@@ -257,7 +353,7 @@ export function computeNextTimeframe(
   const [ey, em, ed] = endDate.split('-').map(Number)
   const sDate = Date.UTC(sy, sm - 1, sd)
   const eDate = Date.UTC(ey, em - 1, ed)
-  const spanDays = Math.round((eDate - sDate) / 86400000)
+  const spanDays = Math.max(0, Math.round((eDate - sDate) / 86400000))
 
   const nextEnd = shiftISODate(nextStart, spanDays)
   return { startDate: nextStart, endDate: nextEnd }

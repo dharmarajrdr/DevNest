@@ -269,4 +269,47 @@ describe('computeNextTimeframe', () => {
     })
     expect(next).toBeNull()
   })
+
+  it('advances past recurring task relative to today upon completion', () => {
+    const today = todayISO()
+    const pastDate = shiftISODate(today, -3)
+    const next = computeNextTimeframe(
+      pastDate,
+      pastDate,
+      {
+        type: 'DAILY',
+        interval: 1,
+      },
+      today,
+    )
+    expect(next?.startDate).toBe(shiftISODate(today, 1))
+    expect(next?.endDate).toBe(shiftISODate(today, 1))
+  })
+})
+
+describe('Daily recurring tasks in Today view', () => {
+  const today = todayISO()
+
+  it('shows daily recurring task in Today even if started in the past and uncompleted', () => {
+    const pastDailyTask = makeTodo({
+      startDate: shiftISODate(today, -2),
+      endDate: shiftISODate(today, -2),
+      recurrence: { type: 'DAILY', interval: 1 },
+      status: 'TODO',
+    })
+
+    expect(isTodayTask(pastDailyTask)).toBe(true)
+    expect(isUpcomingTask(pastDailyTask)).toBe(false)
+    expect(isCompleteable(pastDailyTask)).toBe(true)
+  })
+
+  it('formats timeframe as Today for active daily recurring task', () => {
+    const dailyTask = makeTodo({
+      startDate: shiftISODate(today, -1),
+      recurrence: { type: 'DAILY', interval: 1 },
+      isAllDay: true,
+    })
+
+    expect(formatTaskTimeframe(dailyTask)).toBe('Today (All-day)')
+  })
 })
