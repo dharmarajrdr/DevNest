@@ -95,7 +95,7 @@ export function TaskStreakView({ todos }: Props) {
         <div className="mb-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-text-secondary">Last 12 Months Activity</span>
           {hoveredDay && (
-            <span className="text-[11px] font-medium text-text-primary">
+            <span className="text-xs font-semibold text-text-primary">
               {hoveredDay.isFuture
                 ? 'Future'
                 : `${hoveredDay.count} task${hoveredDay.count === 1 ? '' : 's'} on ${formatDisplayDate(hoveredDay.date)}`}

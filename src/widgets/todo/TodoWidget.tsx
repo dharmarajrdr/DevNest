@@ -14,13 +14,29 @@ import { cn } from '@/utils/cn'
 
 type Filter = 'today' | 'upcoming' | 'overdue' | 'completed' | 'streak'
 
-const FILTERS: { key: Filter; label: string }[] = [
-  { key: 'today', label: 'Today' },
-  { key: 'upcoming', label: 'Upcoming' },
-  { key: 'overdue', label: 'Overdue' },
-  { key: 'completed', label: 'Completed' },
-  { key: 'streak', label: 'Streak' },
+const FILTERS: { key: Filter; label: string, align: 'left' | 'right' }[] = [
+  { key: 'today', label: 'Today', align: 'left' },
+  { key: 'upcoming', label: 'Upcoming', align: 'left' },
+  { key: 'overdue', label: 'Overdue', align: 'left' },
+  { key: 'completed', label: 'Completed', align: 'left' },
+  { key: 'streak', label: 'Streak', align: 'right' },
 ]
+
+const TabButton = ({ f, setFilter, filter }: { f: typeof FILTERS[0]; setFilter: (filter: Filter) => void; filter: Filter }) => {
+  return <button
+    key={f.key}
+    onClick={() => setFilter(f.key)}
+    className={cn(
+      'flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+      filter === f.key
+        ? 'bg-accent/15 text-accent'
+        : 'text-text-secondary hover:text-text-primary',
+    )}
+  >
+    {f.key === 'streak' && <Flame size={12} />}
+    {f.label}
+  </button>
+}
 
 export function TodoWidget() {
   const { todos, load, loading } = useTodoStore()
@@ -80,22 +96,17 @@ export function TodoWidget() {
         <IconButton icon={<Plus size={16} />} label="Add task" onClick={handleOpenCreate} />
       </CardHeader>
 
-      <div className="flex gap-1 border-b border-border px-4 pb-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              'flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
-              filter === f.key
-                ? 'bg-accent/15 text-accent'
-                : 'text-text-secondary hover:text-text-primary',
-            )}
-          >
-            {f.key === 'streak' && <Flame size={12} />}
-            {f.label}
-          </button>
-        ))}
+      <div className="flex gap-1 border-b border-border px-4 pb-2 justify-between">
+        <div className="flex-1 flex gap-1">
+          {FILTERS.filter((f) => f.align == 'left').map((f) => (
+            <TabButton f={f} setFilter={setFilter} filter={filter} />
+          ))}
+        </div>
+        <div className="flex gap-1">
+          {FILTERS.filter((f) => f.align == 'right').map((f) => (
+            <TabButton f={f} setFilter={setFilter} filter={filter} />
+          ))}
+        </div>
       </div>
 
       {filter === 'streak' ? (
