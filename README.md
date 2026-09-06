@@ -37,8 +37,8 @@ Every software engineer opens tens or hundreds of new tabs every day. By default
 
 Designed with an ultra-clean dark aesthetic, DevNest brings together your daily task list, focus timers, documentation shortcuts, code snippets, git/docker cheat sheets, technical blogs, and developer utilities (Diff Viewer, JSON Formatter, JWT Decoder, Regex Tester) into a modular, draggable **Bento Grid**.
 
-> [!NOTE] **100% Privacy & Offline-First**
-DevNest operates completely locally within your browser. No external tracking, no accounts required, and no telemetry sent to remote servers.
+> [!NOTE]
+> **100% Privacy & Offline-First:** DevNest operates completely locally within your browser. No external tracking, no accounts required, and no telemetry sent to remote servers.
 
 ---
 
